@@ -43,14 +43,15 @@
 - Tecnología de la app (lenguaje y librerías de Android, del ajuste y de la salida DXF/PDF): Claude la propone al
   empezar la prueba A.
 - Identificador Android neutro (ni `com.gontanlabs…` ni `com.vlanc…`, o ya el de VLANC).
-- **Plantilla DWG de VLANC** (capas, grosores, estilo de cotas): si existe, el DXF sale ya con ella.
+- **Capas del estado actual:** las plumillas (grosor por color) ya están (`docs/PLUMILLAS.md`); falta qué se dibuja con
+  cada color (muro seccionado, tabiques, carpintería, cotas, textos…): lo dice Jose o se lee de un DWG del estudio.
 - Al traspasar: si se reescribe la autoría de los commits; si sale en el portfolio (con permiso de VLANC).
 
 ## Pendiente de Jose
 
-1. Crear el repo vacío y privado `croquis` en la organización `gontanlabs`:
-   https://github.com/organizations/gontanlabs/repositories/new (Claude lo sube después por SSH).
-2. Decir si VLANC tiene plantilla DWG y pasarla.
+1. El repo se creó en la cuenta personal (`gontanreig/croquis`): transferirlo a la organización `gontanlabs`
+   (https://github.com/gontanreig/croquis/settings, «Transfer ownership»). Claude lo sube después por SSH.
+2. Decir qué se dibuja con cada color en un estado actual, o pasar un DWG del estudio para leer sus capas.
 3. Decir si se prueba magicplan antes de programar.
 
 ## Procesos abiertos
