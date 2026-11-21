@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Croquis · pantallas de la captura</title>
+<style>
+  :root { --f: #1b1d21; --p: #26292f; --t: #eceae4; --s: #9a9ca3; --a: #e4572e; --ok: #5bb98c; --az: #6fb3ff; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #111214; color: var(--t); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { max-width: 1100px; margin: 0 auto; padding: 28px 20px 8px; }
+  h1 { margin: 0 0 6px; font-size: 26px; }
+  header p { margin: 4px 0; color: var(--s); max-width: 760px; }
+  .fila { max-width: 1100px; margin: 0 auto; padding: 20px; display: flex; flex-wrap: wrap; gap: 28px; }
+  .paso { width: 240px; }
+  .paso h2 { font-size: 15px; margin: 10px 0 4px; }
+  .paso p { margin: 0; color: var(--s); font-size: 13.5px; }
+  .movil { width: 240px; height: 500px; border-radius: 28px; background: #000; padding: 10px; box-shadow: 0 0 0 2px #333; }
+  .pant { position: relative; width: 100%; height: 100%; border-radius: 20px; overflow: hidden; background: var(--f); }
+  .camara { background: linear-gradient(160deg, #5b544c 0%, #8a8178 35%, #c9c2b8 60%, #8f877e 100%); }
+  .camara::before { content: ""; position: absolute; left: 0; right: 0; top: 46%; height: 2px; background: rgba(255,255,255,.35); }
+  .instr { position: absolute; left: 10px; right: 10px; top: 12px; padding: 10px 12px; border-radius: 12px;
+    background: rgba(0,0,0,.62); font-size: 15px; font-weight: 600; }
+  .instr small { display: block; font-weight: 400; color: #d8d6d0; font-size: 12px; margin-top: 3px; }
+  .boton { position: absolute; left: 14px; right: 14px; bottom: 16px; padding: 12px; border-radius: 12px; text-align: center;
+    background: var(--a); font-weight: 600; }
+  .boton.sec { background: transparent; border: 1px solid #555; bottom: 66px; font-weight: 400; }
+  .chips { position: absolute; left: 12px; right: 12px; top: 120px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .chips span { padding: 7px 10px; border-radius: 10px; background: var(--p); font-size: 13px; }
+  .chips span.si { background: var(--a); }
+  .titulo { position: absolute; left: 16px; right: 16px; top: 28px; font-size: 22px; font-weight: 700; }
+  .titulo small { display: block; font-size: 13px; color: var(--s); font-weight: 400; margin-top: 4px; }
+  .mini { position: absolute; left: 10px; right: 10px; bottom: 10px; height: 150px; border-radius: 12px; background: rgba(15,16,18,.85); }
+  .mini svg { width: 100%; height: 100%; }
+  .barra { position: absolute; left: 12px; right: 12px; top: 104px; height: 8px; border-radius: 4px; background: rgba(0,0,0,.45); }
+  .barra i { display: block; height: 100%; width: 50%; border-radius: 4px; background: var(--ok); }
+  .flecha { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 54px; color: #fff; text-shadow: 0 2px 6px #000; }
+  .marco { position: absolute; left: 22px; right: 22px; top: 128px; height: 140px; border: 3px solid var(--ok); border-radius: 10px; }
+  .aviso { position: absolute; left: 50%; top: 280px; transform: translateX(-50%); padding: 6px 12px; border-radius: 10px; background: rgba(0,0,0,.6); font-size: 13px; white-space: nowrap; }
+  .lista { position: absolute; left: 14px; right: 14px; top: 250px; font-size: 13px; color: #d8d6d0; }
+  .lista div { padding: 6px 0; border-bottom: 1px solid #2c2f35; }
+  .nota { max-width: 1100px; margin: 0 auto; padding: 4px 20px 40px; color: var(--s); font-size: 13.5px; }
+  .nota h3 { color: var(--t); font-size: 15px; margin: 18px 0 6px; }
+  .nota li { margin: 4px 0; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Croquis: cómo sería la captura</h1>
+  <p>Una habitación cada vez y <b>una pared cada vez</b>. La app te dice qué pared toca y tú la grabas andando de un lado a otro, como un vídeo normal. Debajo se va dibujando la planta con las paredes que ya tiene.</p>
+  <p>Son dibujos para decidir cómo funciona, no la app. Dime qué cambiarías.</p>
+</header>
+
+<div class="fila">
+  <div class="paso">
+    <div class="movil"><div class="pant">
+      <div class="titulo">¿Dónde estás?<small>Toca la habitación</small></div>
+      <div class="chips"><span>Salón</span><span class="si">Comedor</span><span>Cocina</span><span>Dormitorio</span><span>Baño</span><span>Pasillo</span><span>Otra…</span></div>
+      <div class="boton">Empezar el comedor</div>
+    </div></div>
+    <h2>1 · Eliges la habitación</h2>
+    <p>Un toque. La app sabe en qué habitación estás para nombrarla en el plano.</p>
+  </div>
+
+  <div class="paso">
+    <div class="movil"><div class="pant camara">
+      <div class="instr">Pared 1: la que tienes delante<small>Grábala de un lado a otro, andando despacio</small></div>
+      <div class="barra"><i style="width:35%"></i></div>
+      <div class="marco"></div>
+      <div class="aviso">bien, sigue hacia la derecha →</div>
+      <div class="mini"><svg viewBox="0 0 200 130"><rect x="50" y="20" width="100" height="90" fill="none" stroke="#3a3e46" stroke-dasharray="4 4"/><line x1="50" y1="20" x2="95" y2="20" stroke="#5bb98c" stroke-width="4"/><circle cx="100" cy="80" r="5" fill="#e4572e"/><path d="M100 80 L80 35 L120 35 Z" fill="rgba(228,87,46,.3)"/></svg></div>
+    </div></div>
+    <h2>2 · Una pared cada vez</h2>
+    <p>Arriba, la orden en grande. La barra verde dice cuánto de la pared lleva. Debajo, la planta: esa pared se va pintando en verde.</p>
+  </div>
+
+  <div class="paso">
+    <div class="movil"><div class="pant camara">
+      <div class="instr">Pared 1 hecha ✓<small>Ahora gira a tu derecha: pared 2</small></div>
+      <div class="flecha">↻</div>
+      <div class="mini"><svg viewBox="0 0 200 130"><rect x="50" y="20" width="100" height="90" fill="none" stroke="#3a3e46" stroke-dasharray="4 4"/><line x1="50" y1="20" x2="150" y2="20" stroke="#5bb98c" stroke-width="4"/><line x1="150" y1="20" x2="150" y2="110" stroke="#fff" stroke-width="2" stroke-dasharray="3 3"/><circle cx="100" cy="80" r="5" fill="#e4572e"/></svg></div>
+    </div></div>
+    <h2>3 · La app te lleva a la siguiente</h2>
+    <p>Vibra al terminar una pared y te dice hacia dónde girar. Si un mueble tapa parte, da igual: con lo que se vea de la pared basta.</p>
+  </div>
+
+  <div class="paso">
+    <div class="movil"><div class="pant">
+      <div class="titulo">Comedor hecho<small>Revisa que esté bien</small></div>
+      <div class="mini" style="top:90px;bottom:auto;height:150px"><svg viewBox="0 0 200 130"><rect x="45" y="18" width="110" height="92" fill="none" stroke="#eceae4" stroke-width="3"/><line x1="45" y1="70" x2="45" y2="92" stroke="#1b1d21" stroke-width="5"/><line x1="80" y1="18" x2="120" y2="18" stroke="#6fb3ff" stroke-width="5"/></svg></div>
+      <div class="lista"><div>4 paredes</div><div>1 puerta · 1 ventana (marcadas por ti)</div><div>Falta: nada</div></div>
+      <div class="boton sec">Repetir una pared</div>
+      <div class="boton">Siguiente habitación</div>
+    </div></div>
+    <h2>4 · Revisas la habitación</h2>
+    <p>Ves su planta antes de seguir. Si una pared quedó mal, la repites. Puertas y ventanas: un toque sobre la pared en la que están.</p>
+  </div>
+
+  <div class="paso">
+    <div class="movil"><div class="pant">
+      <div class="titulo">Casa completa<small>6 habitaciones · se procesa en el PC</small></div>
+      <div class="mini" style="top:104px;bottom:auto;height:170px"><svg viewBox="0 0 200 150"><rect x="20" y="15" width="80" height="60" fill="none" stroke="#eceae4" stroke-width="2.5"/><rect x="105" y="15" width="75" height="45" fill="none" stroke="#eceae4" stroke-width="2.5"/><rect x="20" y="80" width="80" height="55" fill="none" stroke="#eceae4" stroke-width="2.5"/><rect x="105" y="65" width="35" height="70" fill="none" stroke="#eceae4" stroke-width="2.5"/><rect x="145" y="65" width="35" height="70" fill="none" stroke="#eceae4" stroke-width="2.5"/></svg></div>
+      <div class="lista" style="top:292px"><div>Después: medidas guiadas con el láser</div><div>Y al final, los planos EA.01–EA.04</div></div>
+      <div class="boton">Terminar</div>
+    </div></div>
+    <h2>5 · Terminas</h2>
+    <p>El PC monta la casa y saca el croquis. Luego vienen las medidas con el láser, también pared a pared.</p>
+  </div>
+</div>
+
+<div class="nota">
+  <h3>Por qué así</h3>
+  <ul>
+    <li><b>Pared a pared, andando:</b> es como guía CubiCasa («escanea cada pared»), y moverse de lado es lo que necesita el 3D; girar en el sitio no sirve.</li>
+    <li><b>Una orden cada vez, en grande:</b> no hay que interpretar puntos ni panorámicas.</li>
+    <li><b>La planta debajo:</b> lo que ya está hecho se ve en verde; lo que falta, en gris discontinuo.</li>
+  </ul>
+  <h3>Lo que tienes que decidir</h3>
+  <ul>
+    <li>¿Te parece bien ir pared a pared, o prefieres otra forma?</li>
+    <li>Puertas y ventanas: ¿las marcas tú con un toque (seguro) o intento detectarlas solo (puede fallar)?</li>
+  </ul>
+</div>
+</body>
+</html>
