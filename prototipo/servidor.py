@@ -82,6 +82,13 @@ class Manejador(SimpleHTTPRequestHandler):
 
     def do_POST(self):
         url = urlparse(self.path)
+        if url.path == '/api/foto':           # una foto del escaneo (JPEG en el cuerpo)
+            q = {k: v[0] for k, v in parse_qs(url.query).items()}
+            c = carpeta(q.get('nombre', 'vivienda')) / 'captura'
+            c.mkdir(exist_ok=True)
+            nombre = re.sub(r'[^A-Za-z0-9_.-]+', '_', q.get('fichero', 'foto.jpg'))
+            (c / nombre).write_bytes(self.rfile.read(int(self.headers.get('Content-Length', 0))))
+            return self._json({'ok': True})
         try:
             pedido = json.loads(self.rfile.read(int(self.headers.get('Content-Length', 0))) or b'{}')
             if url.path == '/api/crear':
@@ -94,6 +101,14 @@ class Manejador(SimpleHTTPRequestHandler):
                 datos = lev.responder(pedido['datos'], pedido['id'], pedido['valor'], pedido.get('modo'))
                 guardar(datos)
                 return self._json({'datos': datos, **lev.tareas(datos)})
+            if url.path == '/api/captura':     # posiciones y datos de cada foto del escaneo
+                c = carpeta(pedido.get('nombre', 'vivienda')) / 'captura'
+                c.mkdir(exist_ok=True)
+                f = c / 'fotos.jsonl'
+                with f.open('a', encoding='utf-8') as fh:
+                    for foto in pedido.get('fotos', []):
+                        fh.write(json.dumps(foto, ensure_ascii=False) + '\n')
+                return self._json({'ok': True})
             if url.path == '/api/registro':
                 print('MÓVIL:', json.dumps(pedido, ensure_ascii=False), flush=True)
                 return self._json({'ok': True})

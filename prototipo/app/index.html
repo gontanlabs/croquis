@@ -16,8 +16,12 @@
   <label class="campo">Nombre del levantamiento
     <input id="nombre" type="text" value="Mi casa" autocomplete="off">
   </label>
-  <button id="b-ar" class="grande">Recorrer con la cámara</button>
-  <button id="b-giro" class="grande accion">Probar: girar en el centro de una habitación</button>
+  <button id="b-escanear" class="grande accion">Escanear la casa</button>
+  <p id="e-pendientes" class="nota"></p>
+  <details class="nota"><summary>Otras pruebas</summary>
+    <button id="b-ar" class="grande secundario">Recorrer marcando esquinas</button>
+    <button id="b-giro" class="grande secundario">Girar en el centro (profundidad)</button>
+  </details>
   <button id="b-dibujar" class="grande secundario">Dibujar el croquis a mano</button>
   <div id="seguir"></div>
   <p id="aviso-ar" class="nota"></p>
@@ -38,6 +42,19 @@
     <button id="b-ventana">Ventana</button>
     <button id="b-deshacer">Deshacer</button>
     <button id="b-terminar" class="fin">Terminar</button>
+  </div>
+</section>
+
+<!-- Escaneo guiado: fotos 360 desde uno o dos puntos por habitación -->
+<section id="escaneo" class="pantalla">
+  <canvas id="e-lienzo"></canvas>
+  <canvas id="e-mapa"></canvas>
+  <div class="barra-arriba"><span id="e-estado">¿En qué habitación empiezas?</span><br><small id="e-cuenta"></small></div>
+  <div id="e-chips" class="chips"></div>
+  <div class="barra-abajo">
+    <button id="e-punto">Segundo punto</button>
+    <button id="e-habitacion">Otra habitación</button>
+    <button id="e-terminar" class="fin">Terminar</button>
   </div>
 </section>
 
@@ -87,5 +104,6 @@
 
 <div id="ocupado" hidden><div>Calculando…</div></div>
 <script src="app.js"></script>
+<script src="escaneo.js"></script>
 </body>
 </html>
