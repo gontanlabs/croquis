@@ -94,6 +94,9 @@ class Manejador(SimpleHTTPRequestHandler):
                 datos = lev.responder(pedido['datos'], pedido['id'], pedido['valor'], pedido.get('modo'))
                 guardar(datos)
                 return self._json({'datos': datos, **lev.tareas(datos)})
+            if url.path == '/api/registro':
+                print('MÓVIL:', json.dumps(pedido, ensure_ascii=False), flush=True)
+                return self._json({'ok': True})
             if url.path == '/api/barrido':
                 import time
                 from barrido import paredes

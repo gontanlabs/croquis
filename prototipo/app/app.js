@@ -3,6 +3,13 @@
 // Toda la geometría en metros, en planta (x, y). La cámara: y = -z del espacio de WebXR.
 
 const $ = (s) => document.querySelector(s);
+// Los errores del móvil, al registro del PC
+function registrar(que, detalle) {
+  fetch('/api/registro', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ que, detalle: String(detalle && detalle.stack || detalle), agente: navigator.userAgent }) }).catch(() => {});
+}
+window.addEventListener('error', (e) => registrar('error', e.error || e.message));
+window.addEventListener('unhandledrejection', (e) => registrar('promesa', e.reason));
 const NOMBRES = ['Salón', 'Comedor', 'Cocina', 'Dormitorio', 'Baño', 'Aseo', 'Pasillo', 'Recibidor', 'Terraza', 'Otra'];
 
 const estado = {
@@ -417,14 +424,23 @@ function porMatriz(m, x, y, z, w) {
 const giro = { estancia: null, grabando: false, puntos: [], cubierto: new Array(36).fill(false), suelo: null, centro: [], sesion: null };
 
 $('#b-giro').onclick = async () => {
-  giro.estancia = (prompt('¿Qué habitación vas a probar?', 'Salón') || 'Estancia').trim();
+  giro.n = (giro.n || 0) + 1;                 // sin preguntar: un aviso gastaría el toque que abre la cámara
+  giro.estancia = `Habitación ${giro.n}`;
   estado.captura.nombre = $('#nombre').value.trim() || 'Mi casa';
   Object.assign(giro, { grabando: false, puntos: [], cubierto: new Array(36).fill(false), suelo: null, centro: [] });
   try {
-    const sesion = await navigator.xr.requestSession('immersive-ar', {
-      requiredFeatures: ['depth-sensing', 'hit-test'], optionalFeatures: ['dom-overlay'], domOverlay: { root: $('#giro') },
-      depthSensing: { usagePreference: ['cpu-optimized'], dataFormatPreference: ['luminance-alpha', 'float32'] },
-    });
+    let sesion = null; const fallos = [];
+    for (const formatos of [['luminance-alpha', 'float32'], ['float32', 'luminance-alpha', 'unsigned-short'], ['unsigned-short']]) {
+      try {
+        sesion = await navigator.xr.requestSession('immersive-ar', {
+          requiredFeatures: ['depth-sensing', 'hit-test'], optionalFeatures: ['dom-overlay'], domOverlay: { root: $('#giro') },
+          depthSensing: { usagePreference: ['cpu-optimized'], dataFormatPreference: formatos },
+        });
+        registrar('giro-ok', JSON.stringify({ formatos, uso: sesion.depthUsage, formato: sesion.depthDataFormat }));
+        break;
+      } catch (err) { fallos.push(`${formatos.join('/')}: ${err.name} ${err.message}`); }
+    }
+    if (!sesion) throw new Error(fallos.join(' | '));
     giro.sesion = sesion;
     mostrar('giro');
     $('#g-estado').textContent = 'Ponte en el centro, apunta un momento al suelo y pulsa «Empezar a girar».';
@@ -476,7 +492,8 @@ $('#b-giro').onclick = async () => {
     sesion.requestAnimationFrame(cuadro);
     sesion.addEventListener('end', () => { giro.sesion = null; });
   } catch (e) {
-    alert('Este móvil no da la profundidad de la cámara a la web: ' + e.message);
+    registrar('giro', e);
+    alert('No se pudo abrir la cámara con profundidad: ' + e.message);
   }
 };
 
