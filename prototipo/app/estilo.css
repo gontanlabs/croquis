@@ -64,4 +64,5 @@ h1 { margin: 24px 0 0; font-size: 34px; letter-spacing: -.5px; }
 .alerta { margin-top: 10px; padding: 10px; border-radius: 8px; background: #4a2a1f; color: #ffd9cc; font-size: 14px; }
 #pdfs a { display: block; padding: 12px; margin: 6px 0; border-radius: 10px; background: var(--panel);
   color: var(--texto); text-decoration: none; }
+[hidden] { display: none !important; }
 #ocupado { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(0,0,0,.55); font-size: 18px; }
