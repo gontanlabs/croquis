@@ -9,4 +9,8 @@ Una entrada por sesión, la más reciente arriba.
 - **Hecho:** investigación de partida (ARCore, RoomPlan, magicplan, el Bosch GLM 40-31; en `docs/ROADMAP.md`); carpeta,
   `git init`, `CLAUDE.md`, `README.md` y documentos; fila en `LAB.md`; regla de Ampolleta.
 - **Decisiones:** C-001 a C-005.
-- **Siguiente paso:** el repo en GitHub (lo crea Jose) y la prueba A (el ajuste sin cámara).
+- **Más tarde, el mismo día:** plumillas y plantilla del estudio leídas (AutoCAD 2027 por consola); repo en GitHub;
+  prueba A con una estancia inventada; vivienda completa con un piso inventado (red de toda la casa, láminas EA.01–EA.04
+  impresas con AutoCAD y revisadas una a una: muros, puertas, ventanas, cotas, sección en el sentido correcto, nombres
+  sin pisar nada). Decisiones C-006 a C-008.
+- **Siguiente paso:** las medidas de la casa de Jose (las está tomando) → `levantar.py` → láminas.

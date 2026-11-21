@@ -6,16 +6,34 @@
     "tabique": "Tabiques",
     "relleno": "Rellenos",
     "cotas": "Cotas",
-    "textos": "Textos"
+    "textos": "Textos",
+    "puertas": "Puertas",
+    "ventanas": "Ventanas"
   },
   "grosor_muro_desde": 0.2,
   "estilo_cota": "Cotas 50",
   "separacion_cota": 0.35,
   "estilo_texto": "Textos 50",
   "altura_texto": 0.1,
-  "laminas": {"cotas": "Estado actual - Cotas"},
+  "laminas": {
+    "distribucion": "Estado actual - Distribucion",
+    "cotas": "Estado actual - Cotas",
+    "alzado": "Estado actual - Alzado",
+    "seccion": "Estado actual - Seccion"
+  },
   "cajetin": {
     "bloque": "Cajetin_A3",
-    "campos": {"fecha": "FECHA", "promotor": "PROMOTOR", "direccion": "DIRECCION", "referencia": "REFERENCIA"}
+    "campos": {
+      "fecha": "FECHA",
+      "promotor": "PROMOTOR",
+      "direccion": "DIRECCION",
+      "referencia": "REFERENCIA",
+      "subtitulo": "SUBTITULO"
+    }
+  },
+  "capas_alzado": {
+    "cortado": "Alzado cortado",
+    "lejos": "Alzado lejos",
+    "huecos": "Alzado huecos"
   }
 }

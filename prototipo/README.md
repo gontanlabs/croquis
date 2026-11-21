@@ -9,6 +9,23 @@ El ajuste de Croquis en Python, antes de llevarlo a Android.
 - `prueba_a.py`: estancia inventada en L, medidas simuladas de un láser de mano, bucle de «mide esto», error de tecleo
   y lámina. Escribe `salida/informe.txt` y `salida/prueba_a.dxf`.
 - `test_ajuste.py`: `python test_ajuste.py`.
+- `vivienda.py`: la casa entera. Estancias unidas por las jambas de sus puertas (jamba a escuadra, ±3 mm) y caras de
+  tabique paralelas (±3 mm, detectadas solas); qué medir después, también de una estancia a otra por una puerta.
+- `planos.py`: láminas de distribución, cotas, alzado interior y sección dentro de la plantilla del estudio.
+- `prueba_vivienda.py`: piso inventado de seis estancias medido con el protocolo de campo; láminas en `salida/`.
+- `levantar.py <datos.json> [--laminas]`: un levantamiento real (en `../levantamientos/`, fuera de git).
+- `imprimir.py <dxf> <láminas…>`: PDF con la consola de AutoCAD y las plumillas del estudio.
+
+## Protocolo de campo (láser de mano y cinta)
+
+1. Croquis a mano; cada estancia con nombre y sus esquinas numeradas dando la vuelta (S1, S2…). Salientes de más de 2 cm
+   (pilares, bajantes) son esquinas.
+2. En cada estancia: cada pared de esquina a esquina (a la misma altura en toda la casa), una diagonal (dos si es en L)
+   y la altura libre (falsos techos, vigas y descuelgues, con su altura y dónde).
+3. En cada puerta, por los dos lados: de una esquina a cada jamba; grosor de la pared en la puerta (con cinta); altura
+   del hueco, hacia dónde abre y dónde está la bisagra.
+4. En cada ventana: de una esquina a cada jamba (por dentro), antepecho, dintel y grosor de fachada (con cinta).
+5. Croquis pide después lo que falte (diagonales o medidas de una estancia a otra con la puerta abierta).
 
 Configuración del estudio, fuera del repo: `~/.croquis/estudio.json` (ejemplo: `estudio.ejemplo.json`) y la plantilla
 en DXF, `~/.croquis/plantilla.dxf`. Requisitos: `numpy`, `ezdxf`.

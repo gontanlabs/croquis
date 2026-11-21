@@ -1,6 +1,6 @@
 # Roadmap — Croquis
 
-Última actualización: 2026-11-21 (prueba A con una estancia inventada).
+Última actualización: 2026-11-21 (vivienda completa con un piso inventado; a la espera de la casa de Jose).
 
 ## Estado
 
@@ -9,6 +9,11 @@
 las seis paredes y cuatro medidas que pide Croquis, el plano cierra a ±4,4 mm y el error real máximo es de 4,1 mm;
 detecta una medida mal tecleada; la lámina EA.02 sale dentro de la plantilla del estudio y AutoCAD la imprime con sus
 plumillas (`prototipo/README.md`).
+**Vivienda completa** (`prototipo/vivienda.py`, `planos.py`): piso inventado de seis estancias; red de toda la casa
+unida por las jambas de las puertas (con la jamba a escuadra, ±3 mm) y las dos caras de cada tabique paralelas (±3 mm);
+con la primera vuelta del protocolo cada estancia cierra a ±4,2 mm y la casa entera a ±10,7 mm (error real 11,7 mm):
+lo que queda es el grosor de los tabiques sin puerta, que no se puede medir desde dentro. Láminas EA.01 (distribución),
+EA.02 (cotas), EA.03 (alzado interior) y EA.04 (sección), impresas con AutoCAD y revisadas.
 
 ## Lo que se sabe (investigación del 2026-11-21)
 
@@ -30,7 +35,10 @@ plumillas (`prototipo/README.md`).
 
 1. ✖ Probar magicplan: descartado por Jose (C-008), app propia desde cero.
 2. ⏳ **Prueba A, el ajuste sin cámara:** ✅ con una estancia inventada (2026-11-21); ☐ con una habitación real medida
-   por Jose con el GLM 40-31.
+   por Jose con el GLM 40-31: sustituida por la casa entera (Jose: «estoy en casa y quiero sacar los planos completos,
+   eso nos servira de prueba»).
+2b. ⏳ **Vivienda completa:** ✅ con un piso inventado; ☐ con la casa de Jose (`levantamientos/`, fuera de git;
+   `python prototipo/levantar.py <datos.json> --laminas`).
 3. ☐ **Prueba B, la cámara:** qué saca ARCore (Raw Depth) en el móvil de pruebas (Huawei P30, sin sensor de
    profundidad); primero, comprobar si lo admite.
 4. ☐ **App mínima:** croquis a mano en la pantalla, medidas tecleadas, ajuste y planta en DXF y PDF.
@@ -43,6 +51,9 @@ plumillas (`prototipo/README.md`).
 ## Por decidir
 
 - Cuadro de superficies de la plantilla: hoy queda con sus valores de ejemplo; Croquis debería rellenarlo.
+- Casa entera a ±5 mm: entre estancias separadas por un tabique sin puerta no se llega desde dentro (queda en ±1 cm);
+  ¿basta con que cada estancia, sus puertas y grosores cumplan ±5 mm y la casa se dé con su margen?
+- Dónde cortar las secciones y qué alzados sacar: hoy se eligen a mano; C-007 pide las suficientes.
 
 - Tecnología de la app (lenguaje y librerías de Android, del ajuste y de la salida DXF/PDF): Claude la propone al
   empezar la prueba A.
@@ -53,8 +64,7 @@ plumillas (`prototipo/README.md`).
 
 ## Pendiente de Jose
 
-1. Medir una habitación de su casa con el GLM 40-31: hacer un croquis a mano con las esquinas en orden (A, B, C…),
-   medir cada pared de esquina a esquina a ras de suelo y la altura; Croquis dirá qué diagonales faltan.
+1. Medir su casa con el protocolo de campo (en la conversación del 2026-11-21 y en `prototipo/README.md`).
 
 ## Procesos abiertos
 
