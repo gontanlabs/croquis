@@ -1,0 +1,14 @@
+# Android / Gradle
+.gradle/
+build/
+local.properties
+*.apk
+*.aab
+captures/
+.idea/
+*.iml
+# Claves de firma: fuera del repo (~/.croquis)
+*.jks
+*.keystore
+# Datos de levantamientos reales (clientes): nunca en el repo
+levantamientos/
