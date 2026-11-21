@@ -43,3 +43,8 @@ aprobar va a «Por decidir» del roadmap.
   igualmente con una app propia, pues mejor, no se si se basa en un sistema de codigo abierto o lo han desarrollado
   ellos, pero prefiero que empecemos de cero». (magicplan es de código cerrado, de Sensopia.) Desde cero no quita usar
   librerías abiertas para lo que no es propio (leer y escribir DXF, álgebra).
+
+**C-009 · 2026-11-21 · Por ahora, Croquis es para uso de Jose.**
+- Jose, al preguntarle si la licencia de VGGT la aceptaría él o VLANC: «es para mi por el momento». Las pruebas se hacen
+  con modelos de uso no comercial cuando no haya otra cosa (VGGT-1B); antes de pasar a VLANC, cambiar a los comerciales
+  (VGGT-1B-Commercial) o a otros con licencia que lo permita. Matiza C-002 mientras dure.
