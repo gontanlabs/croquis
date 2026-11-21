@@ -74,10 +74,17 @@ Siguiente: corregir ese sesgo, el caso de cristales y espejos, y más casas.
 
 ## Pendiente de Jose
 
-1. Revisar `docs/DISENO.md`.
+1. Decir si se mandan a la Papelera unos 15 GB de esta sesión fuera de GontanLabs: VGGT (modelo en la caché de
+   Hugging Face, 9,6 GB, y `~/herramientas/vggt-env`, 4,6 GB), el instalador de COLMAP (`~/herramientas/colmap-descarga`)
+   y el zip duplicado del escaneo en Descargas.
 
 ## Procesos abiertos
 
-- Servidor local de Croquis en la red (`prototipo/servidor.py --red`), arrancado en la sesión del 2026-11-21 para subir
-  desde el iPad: pararlo al cerrar la sesión.
-- Datos del banco en `levantamientos/arkitscenes/` (unos 2 GB, fuera del repo): se pueden borrar y volver a bajar.
+- **Banco con once casas de ARKitScenes** (`prototipo/banco/todo.py`), lanzado el 2026-11-21 por la noche; deja cada
+  casa en `levantamientos/arkitscenes/resumen.json` según termina. Si se corta, se reanuda solo con
+  `python banco/todo.py` (salta las casas hechas).
+- **Código sin guardar en git** (a medias, sin terminar de probar): `prototipo/banco/` (el banco),
+  `detectar.py` (`caras_de_pared`: cara por apoyo a lo largo de la pared), `alinear.py` (`alinear_a_planta`) y
+  `roomplan.py` (opción `nube=`, **no fiable**: no usar todavía).
+- Datos del banco en `levantamientos/arkitscenes/` (unos 5,5 GB, fuera del repo): se pueden borrar y volver a bajar.
+- El servidor local de Croquis en la red, parado al pausar.
