@@ -217,7 +217,8 @@ class Vivienda:
                 for j, s in enumerate(lado['jambas']):
                     n = f"{pu['id']}.{i}.{j}"
                     ini[n] = self._sobre_pared(c, pared, s)
-                    modo = 'laser' if s >= 0.15 else 'cinta'
+                    modos = lado.get('modos')
+                    modo = modos[j] if modos else ('laser' if s >= 0.15 else 'cinta')
                     obs.append(Obs('dist', (pared[0], n), s, MARGENES[modo], f"{pared[0]}–jamba {pu['id']}", modo))
                     obs.append(Obs('linea', (n, pared[0], pared[1]), 0.0, SIGMA_LINEA))
                     nom.append(n)
@@ -232,7 +233,8 @@ class Vivienda:
                 pu['_pares'] = pares
                 pared = pu['lados'][0]['pared']
                 for p, q in pares:
-                    obs.append(Obs('dist', (p, q), pu['grosor'], MARGENES['cinta'], f"grosor {pu['id']}", 'cinta'))
+                    mg = pu.get('grosor_modo', 'cinta')
+                    obs.append(Obs('dist', (p, q), pu['grosor'], MARGENES[mg], f"grosor {pu['id']}", mg))
                     obs.append(Obs('perp', (p, q, pared[0], pared[1]), 0.0, SIGMA_JAMBA))
         for e in self.datos['estancias'].values():
             es = e['esquinas']
@@ -335,7 +337,7 @@ class Vivienda:
                 return None
             minimo = mejora_minima / 2
         puntos = self.esquinas() + [n for nom in self.jambas.values() for n in nom]
-        hechas = {frozenset(o.puntos) for o in r.obs if o.tipo == 'dist'}
+        hechas = {frozenset(o.puntos) for o in r.obs if o.tipo == 'dist' and o.modo != 'camara'}
         libre = self.libre()
         s2 = MARGENES[modo] ** 2
         mejor = None

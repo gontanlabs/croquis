@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1b1d21">
+<title>Croquis</title>
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+
+<!-- Inicio -->
+<section id="inicio" class="pantalla activa">
+  <h1>Croquis</h1>
+  <p class="sub">Estado actual de una vivienda</p>
+  <label class="campo">Nombre del levantamiento
+    <input id="nombre" type="text" value="Mi casa" autocomplete="off">
+  </label>
+  <button id="b-ar" class="grande">Recorrer con la cámara</button>
+  <button id="b-dibujar" class="grande secundario">Dibujar el croquis a mano</button>
+  <div id="seguir"></div>
+  <p id="aviso-ar" class="nota"></p>
+</section>
+
+<!-- Recorrido (cámara o dibujo) -->
+<section id="recorrido" class="pantalla">
+  <canvas id="lienzo"></canvas>
+  <div id="cruz" hidden></div>
+  <div class="barra-arriba">
+    <span id="estado">Elige una estancia</span>
+  </div>
+  <div id="chips" class="chips"></div>
+  <div class="barra-abajo">
+    <button id="b-esquina" class="accion">Esquina</button>
+    <button id="b-cerrar">Cerrar estancia</button>
+    <button id="b-puerta">Puerta</button>
+    <button id="b-ventana">Ventana</button>
+    <button id="b-deshacer">Deshacer</button>
+    <button id="b-terminar" class="fin">Terminar</button>
+  </div>
+</section>
+
+<!-- Medir -->
+<section id="medir" class="pantalla">
+  <canvas id="plano"></canvas>
+  <div class="tarjeta">
+    <div class="progreso"><span id="cuenta"></span><span id="margen"></span></div>
+    <h2 id="t-texto"></h2>
+    <p id="t-ayuda" class="nota"></p>
+    <div id="t-entrada">
+      <input id="valor" type="text" inputmode="decimal" placeholder="0,000" autocomplete="off">
+      <span class="unidad">m</span>
+      <div class="modos">
+        <button data-modo="laser" class="modo">Láser</button>
+        <button data-modo="cinta" class="modo">Cinta</button>
+      </div>
+    </div>
+    <div id="t-opciones"></div>
+    <div id="sospechas" class="alerta" hidden></div>
+    <div class="botones">
+      <button id="b-saltar" class="secundario">Saltar</button>
+      <button id="b-guardar" class="accion">Guardar</button>
+    </div>
+    <button id="b-planos" class="grande secundario">Sacar los planos</button>
+    <div id="pdfs"></div>
+  </div>
+</section>
+
+<div id="ocupado" hidden><div>Calculando…</div></div>
+<script src="app.js"></script>
+</body>
+</html>
