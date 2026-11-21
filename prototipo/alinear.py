@@ -26,7 +26,27 @@ def leer_nube(ruta: Path):
     else:                                                     # OBJ: los vértices
         P = np.array([[float(v) for v in l.split()[1:4]] for l in ruta.read_text(errors='ignore').splitlines()
                       if l.startswith('v ')])
-    return P[np.isfinite(P).all(1)]
+    P = P[np.isfinite(P).all(1)]
+    return vertical_y(P)
+
+
+def vertical_y(P):
+    """Pone el eje vertical en Y: el eje con más puntos acumulados en sus dos extremos (suelo y techo). Algunas
+    exportaciones PLY vienen con Z hacia arriba."""
+    mejor = None
+    for k in range(3):
+        v = P[:, k]; lo, hi = np.percentile(v, [1, 99])
+        if hi - lo < 1.5:
+            continue
+        cerca = ((np.abs(v - lo) < 0.05) | (np.abs(v - hi) < 0.05)).mean()
+        if mejor is None or cerca > mejor[0]:
+            mejor = (cerca, k)
+    k = mejor[1] if mejor else 1
+    if k == 1:
+        return P
+    if k == 2:                                   # Z arriba → Y arriba (x, z, -y)
+        return np.c_[P[:, 0], P[:, 2], -P[:, 1]]
+    return np.c_[P[:, 1], P[:, 0], P[:, 2]]
 
 
 def _T(s):
