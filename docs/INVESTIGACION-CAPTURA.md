@@ -49,3 +49,20 @@ Por qué: los primeros intentos (esquina a esquina, giro con profundidad, fotos 
 - **Escala:** una medida de láser (sin realidad aumentada no hay metros).
 - La vista previa con imágenes dobles era de unir fotos tomadas desde sitios distintos sin alinearlas; con vídeo no hace
   falta.
+
+## 5. Código abierto que ya existe (búsqueda del 2026-11-21, después de que Jose preguntara)
+
+- **Apps de Android que hacen planos con la cámara** (magicplan, Plotlay Scan, vPlan AR): cerradas, y por esquinas.
+  **openPlan3D** (MIT, [github.com/laanlabs/openPlan3D](https://github.com/laanlabs/openPlan3D)): solo iPhone con
+  LiDAR; su editor de planos podría reutilizarse. **RTAB-Map** ([introlab.github.io/rtabmap](https://introlab.github.io/rtabmap)):
+  motor abierto de escaneo 3D con versión Android y ARCore; sin probar en un móvil sin sensor de profundidad.
+- **VGGT** (Meta, CVPR 2025, [artículo](https://arxiv.org/abs/2503.11651)): de una, pocas o cientos de fotos saca las
+  cámaras, los mapas de puntos y la profundidad, en segundos. **VGGT-1B-Commercial** admite uso comercial salvo militar
+  ([Hugging Face](https://huggingface.co/facebook/VGGT-1B-Commercial)); los pesos están restringidos (cuenta de Hugging
+  Face, petición y aprobación manual de Meta). El VGGT-1B original es no comercial.
+- **SpatialLM** (NeurIPS 2025, [github.com/manycore-research/SpatialLM](https://github.com/manycore-research/SpatialLM)):
+  de una nube de puntos saca paredes, puertas y ventanas; pesos CC-BY-NC (no comercial): no vale para VLANC tal cual.
+- **MASt3R-SLAM** (CVPR 2025): reconstrucción en directo desde vídeo; puntos de control no comerciales.
+
+**Camino comercial posible:** vídeo o fotos → VGGT-1B-Commercial (geometría) → paredes por encima de los muebles
+(`prototipo/barrido.py`) o RoomFormer si su licencia lo permite → medidas guiadas → planos.
