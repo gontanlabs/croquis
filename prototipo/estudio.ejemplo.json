@@ -1,0 +1,21 @@
+{
+  "_nota": "Ejemplo. La de verdad va en ~/.croquis/estudio.json, fuera del repo, con los nombres de la plantilla de cada estudio.",
+  "plantilla": "~/.croquis/plantilla.dxf",
+  "capas": {
+    "muro": "Muros",
+    "tabique": "Tabiques",
+    "relleno": "Rellenos",
+    "cotas": "Cotas",
+    "textos": "Textos"
+  },
+  "grosor_muro_desde": 0.2,
+  "estilo_cota": "Cotas 50",
+  "separacion_cota": 0.35,
+  "estilo_texto": "Textos 50",
+  "altura_texto": 0.1,
+  "laminas": {"cotas": "Estado actual - Cotas"},
+  "cajetin": {
+    "bloque": "Cajetin_A3",
+    "campos": {"fecha": "FECHA", "promotor": "PROMOTOR", "direccion": "DIRECCION", "referencia": "REFERENCIA"}
+  }
+}

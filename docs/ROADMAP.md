@@ -1,11 +1,14 @@
 # Roadmap — Croquis
 
-Última actualización: 2026-11-21 (creación del proyecto).
+Última actualización: 2026-11-21 (prueba A con una estancia inventada).
 
 ## Estado
 
-2026-11-21: proyecto creado, sin código. Idea, salidas, precisión y reglas del traspaso a VLANC, decididas
-(`docs/DECISIONES.md`).
+2026-11-21: proyecto creado; idea, salidas, precisión y reglas del traspaso a VLANC, decididas (`docs/DECISIONES.md`).
+**Prueba A hecha con una estancia inventada** (`prototipo/`, en Python): salón en L con paredes fuera de escuadra; con
+las seis paredes y cuatro medidas que pide Croquis, el plano cierra a ±4,4 mm y el error real máximo es de 4,1 mm;
+detecta una medida mal tecleada; la lámina EA.02 sale dentro de la plantilla del estudio y AutoCAD la imprime con sus
+plumillas (`prototipo/README.md`).
 
 ## Lo que se sabe (investigación del 2026-11-21)
 
@@ -25,10 +28,9 @@
 
 ## Plan
 
-1. ☐ **Probar magicplan** una tarde en una habitación y apuntar qué le falta para un estado actual de ±5 mm
-   (propuesta de Claude).
-2. ☐ **Prueba A, el ajuste sin cámara:** croquis más medidas de una habitación real → plano cuadrado, con el margen de
-   cada cota. Es la parte que vale.
+1. ✖ Probar magicplan: descartado por Jose (C-008), app propia desde cero.
+2. ⏳ **Prueba A, el ajuste sin cámara:** ✅ con una estancia inventada (2026-11-21); ☐ con una habitación real medida
+   por Jose con el GLM 40-31.
 3. ☐ **Prueba B, la cámara:** qué saca ARCore (Raw Depth) en el móvil de pruebas (Huawei P30, sin sensor de
    profundidad); primero, comprobar si lo admite.
 4. ☐ **App mínima:** croquis a mano en la pantalla, medidas tecleadas, ajuste y planta en DXF y PDF.
@@ -40,6 +42,8 @@
 
 ## Por decidir
 
+- Cuadro de superficies de la plantilla: hoy queda con sus valores de ejemplo; Croquis debería rellenarlo.
+
 - Tecnología de la app (lenguaje y librerías de Android, del ajuste y de la salida DXF/PDF): Claude la propone al
   empezar la prueba A.
 - Identificador Android neutro (ni `com.gontanlabs…` ni `com.vlanc…`, o ya el de VLANC).
@@ -49,7 +53,8 @@
 
 ## Pendiente de Jose
 
-1. Decir si se prueba magicplan antes de programar.
+1. Medir una habitación de su casa con el GLM 40-31: hacer un croquis a mano con las esquinas en orden (A, B, C…),
+   medir cada pared de esquina a esquina a ras de suelo y la altura; Croquis dirá qué diagonales faltan.
 
 ## Procesos abiertos
 

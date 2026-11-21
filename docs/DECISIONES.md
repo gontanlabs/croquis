@@ -37,3 +37,9 @@ aprobar va a «Por decidir» del roadmap.
 
 **C-007 · 2026-11-21 · Secciones: las suficientes para que se entienda todo y no quede ninguna medida por obtener.**
 - Jose: «en cuanto al numero las suficientes para que se entienda todo y no se queden medidas por obtener, claro».
+
+**C-008 · 2026-11-21 · App propia desde cero; magicplan no se prueba.**
+- Jose: «ya es una app, no, porque ademas estara limitada con planes de pago etc, si lo podemos hacer nosotros
+  igualmente con una app propia, pues mejor, no se si se basa en un sistema de codigo abierto o lo han desarrollado
+  ellos, pero prefiero que empecemos de cero». (magicplan es de código cerrado, de Sensopia.) Desde cero no quita usar
+  librerías abiertas para lo que no es propio (leer y escribir DXF, álgebra).

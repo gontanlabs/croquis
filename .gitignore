@@ -12,3 +12,7 @@ captures/
 *.keystore
 # Datos de levantamientos reales (clientes): nunca en el repo
 levantamientos/
+
+# Prototipo: lo que genera (DXF, PDF, informes) y cachés
+prototipo/salida/
+__pycache__/
