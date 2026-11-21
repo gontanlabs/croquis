@@ -48,3 +48,14 @@ aprobar va a «Por decidir» del roadmap.
 - Jose, al preguntarle si la licencia de VGGT la aceptaría él o VLANC: «es para mi por el momento». Las pruebas se hacen
   con modelos de uso no comercial cuando no haya otra cosa (VGGT-1B); antes de pasar a VLANC, cambiar a los comerciales
   (VGGT-1B-Commercial) o a otros con licencia que lo permita. Matiza C-002 mientras dure.
+
+**C-010 · 2026-11-21 · Croquis es un producto para vender: app para iPhone Pro / iPad Pro con LiDAR y panel web; Android, fuera.**
+- Jose: «lo que quiero es al final no solo un modo de hacer las mediciones para el estudio sino un sistema o app lo mas
+  sencillo e integrado posible que vender, por eso te pregunto el mejor formato posible»; ante la propuesta (app iOS con
+  escaneo RoomPlan y medidas guiadas en la misma app, panel web donde el estudio sube su plantilla y descarga DXF/PDF,
+  suscripción por estudio, Android fuera por no tener LiDAR ni RoomPlan, VLANC como primer cliente, construcción sin Mac
+  con Expo y expo-roomplan): «me encaja». Antes: «para que necesitamos el android entonces? noe s mejor un pc?».
+- Cambia C-001 («he pensado en android»): el campo es el iPad o iPhone Pro; la oficina, el PC o la web.
+- Sus diferencias (Dunford, pasos 4–5; Christensen, el «trabajo» como progreso en una situación): planos en la plantilla
+  de cada estudio, precisión comprobada con láser donde importa, serie completa del estado actual.
+- Pendiente para venderlo: generar los PDF sin AutoCAD, aplicando las plumillas del estudio.

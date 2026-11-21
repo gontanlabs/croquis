@@ -31,22 +31,21 @@ EA.02 (cotas), EA.03 (alzado interior) y EA.04 (sección), impresas con AutoCAD 
 - **El láser de Jose, Bosch GLM 40-31** (0601075000): en su ficha oficial no aparece Bluetooth, y en Bosch los que
   conectan llevan «C» en el nombre. Sus medidas se teclean.
 
-## Plan
+## Plan (C-010: producto con app para iPhone/iPad Pro y panel web)
 
-1. ✖ Probar magicplan: descartado por Jose (C-008), app propia desde cero.
-2. ⏳ **Prueba A, el ajuste sin cámara:** ✅ con una estancia inventada (2026-11-21); ☐ con una habitación real medida
-   por Jose con el GLM 40-31: sustituida por la casa entera (Jose: «estoy en casa y quiero sacar los planos completos,
-   eso nos servira de prueba»).
-2b. ⏳ **Vivienda completa:** ✅ con un piso inventado; ☐ con la casa de Jose (`levantamientos/`, fuera de git;
-   `python prototipo/levantar.py <datos.json> --laminas`).
-3. ☐ **Prueba B, la cámara:** qué saca ARCore (Raw Depth) en el móvil de pruebas (Huawei P30, sin sensor de
-   profundidad); primero, comprobar si lo admite.
-4. ☐ **App mínima:** croquis a mano en la pantalla, medidas tecleadas, ajuste y planta en DXF y PDF.
-5. ☐ Alzados y secciones (alturas, antepechos, dinteles, falsos techos, vigas).
-6. ☐ Cámara como primera aproximación de la forma.
-7. ☐ Láser por Bluetooth (Bosch, Leica…), como un modo de medir más.
-8. ☐ Modelo 3D exportable.
-9. ☐ Traspaso a VLANC.
+1. ✅ Investigación de captura (`docs/INVESTIGACION-CAPTURA.md`): el móvil Android sin LiDAR no basta; el iPad Pro con
+   RoomPlan sí (comedor: −5 mm de ancho; los 18 cm del largo eran un hueco que RoomPlan simplifica).
+2. ☐ **Fase 1, sin app propia:** escaneo con OpenPlan3D Capture (gratis, MIT) → Croquis importa su `plan.json` →
+   medidas guiadas tecleadas (el GLM 40-31 no tiene Bluetooth) con preguntas de huecos y salientes por pared → planos
+   EA.01–EA.04 en la plantilla. Primera prueba: el comedor de Jose.
+3. ☐ **Fase 2, app propia de iPad/iPhone** con Expo y expo-roomplan (sin Mac): escaneo y medidas en la misma app;
+   láser Bluetooth opcional.
+4. ☐ **Panel web** del estudio: subir la plantilla, ver las viviendas, descargar DXF/PDF.
+5. ☐ PDF sin AutoCAD (plumillas aplicadas por el programa).
+6. ☐ Probarlo en VLANC (primer cliente) y preparar la venta (suscripción por estudio).
+
+Lo hecho antes (prototipo en Python, `prototipo/`): ajuste de toda la casa, láminas en la plantilla del estudio,
+servidor y app web de pruebas en Android (descartada como captura).
 
 ## Por decidir
 

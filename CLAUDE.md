@@ -1,8 +1,9 @@
 # Croquis — ficha del proyecto
 
-App Android para hacer el **estado actual de una vivienda** y sacar planos verídicos y exactos: plantas, alzados y
-secciones en **DXF y PDF** (el modelo 3D, opcional, más adelante). La cámara da una primera aproximación de la forma y
-las medidas la van puliendo hasta **±5 mm** en toda la casa.
+Producto para estudios de arquitectura e interiorismo (C-010): el **estado actual de una vivienda** con planos
+verídicos y exactos (plantas, alzados y secciones en **DXF y PDF**, en la plantilla de cada estudio). En la visita, una
+**app para iPhone Pro o iPad Pro**: escaneo con LiDAR (RoomPlan) y medidas guiadas con láser hasta **±5 mm**; en el
+estudio, un **panel web** con la plantilla y los planos. Android, fuera (sin LiDAR ni RoomPlan). Primer cliente: VLANC.
 
 **Proyecto para VLANC desarrollado en Gontan Labs** (L-024 del ecosistema, C-002): es una herramienta del estudio, se
 desarrolla aquí «al menos en inicio» y se traspasa a VLANC cuando toque. Sus horas cuentan para VLANC (Ampolleta:
@@ -13,8 +14,7 @@ desarrolla aquí «al menos en inicio» y se traspasa a VLANC cuando toque. Sus 
 ## Para que el traspaso a VLANC sea limpio
 
 - **Nombre neutro:** ni «gontanlabs» ni «vlanc» en el código, en el identificador de la app ni en los textos.
-- **Sin Google Play:** se instala el APK en los móviles del estudio. Clave de firma propia, fuera del repo
-  (`~/.croquis`), nunca la de DeCA10 ni la de Kipp.
+- La app de iPad se compila con Expo (EAS, en la nube, sin Mac); cuenta de desarrollador de Apple cuando haga falta.
 - **Sin datos de clientes de VLANC en el repo:** las pruebas, con viviendas propias o medidas inventadas.
 - Git con la identidad de Gontan Labs, como todo el laboratorio. Al traspasar se decide si se reescribe la autoría.
 - En el portfolio de gontanlabs.com, solo con el visto bueno de VLANC.
