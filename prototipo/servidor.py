@@ -94,6 +94,14 @@ class Manejador(SimpleHTTPRequestHandler):
                 datos = lev.responder(pedido['datos'], pedido['id'], pedido['valor'], pedido.get('modo'))
                 guardar(datos)
                 return self._json({'datos': datos, **lev.tareas(datos)})
+            if url.path == '/api/barrido':
+                import time
+                from barrido import paredes
+                c = carpeta(pedido.get('nombre', 'vivienda')) / 'barridos'
+                c.mkdir(exist_ok=True)
+                (c / f"{pedido.get('estancia', 'estancia')}-{time.strftime('%H%M%S')}.json").write_text(
+                    json.dumps(pedido), encoding='utf-8')
+                return self._json(paredes(pedido['puntos'], pedido.get('suelo'), pedido.get('centro', (0, 0))))
             if url.path == '/api/planos':
                 datos = pedido['datos']
                 c = guardar(datos)

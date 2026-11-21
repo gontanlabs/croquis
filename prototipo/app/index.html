@@ -17,6 +17,7 @@
     <input id="nombre" type="text" value="Mi casa" autocomplete="off">
   </label>
   <button id="b-ar" class="grande">Recorrer con la cámara</button>
+  <button id="b-giro" class="grande accion">Probar: girar en el centro de una habitación</button>
   <button id="b-dibujar" class="grande secundario">Dibujar el croquis a mano</button>
   <div id="seguir"></div>
   <p id="aviso-ar" class="nota"></p>
@@ -37,6 +38,24 @@
     <button id="b-ventana">Ventana</button>
     <button id="b-deshacer">Deshacer</button>
     <button id="b-terminar" class="fin">Terminar</button>
+  </div>
+</section>
+
+<!-- Giro en el centro: profundidad de la cámara -->
+<section id="giro" class="pantalla">
+  <div class="barra-arriba"><span id="g-estado">Ponte en el centro de la habitación</span></div>
+  <canvas id="g-anillo"></canvas>
+  <div class="barra-abajo dos">
+    <button id="g-empezar" class="accion">Empezar a girar</button>
+    <button id="g-terminar" class="fin">Terminar</button>
+  </div>
+</section>
+<section id="resultado" class="pantalla">
+  <canvas id="r-plano"></canvas>
+  <div class="tarjeta">
+    <h2 id="r-titulo"></h2>
+    <p id="r-detalle" class="nota"></p>
+    <button id="r-otra" class="grande secundario">Probar otra habitación</button>
   </div>
 </section>
 

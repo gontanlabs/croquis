@@ -65,4 +65,10 @@ h1 { margin: 24px 0 0; font-size: 34px; letter-spacing: -.5px; }
 #pdfs a { display: block; padding: 12px; margin: 6px 0; border-radius: 10px; background: var(--panel);
   color: var(--texto); text-decoration: none; }
 [hidden] { display: none !important; }
+#giro { position: relative; background: transparent; }
+#g-anillo { position: absolute; left: 50%; top: 50%; width: 220px; height: 220px; margin: -110px 0 0 -110px; }
+.barra-abajo.dos { grid-template-columns: 1fr 1fr; }
+#resultado { display: none; flex-direction: column; }
+#resultado.activa { display: flex; }
+#r-plano { flex: 1 1 60%; width: 100%; background: #15171a; }
 #ocupado { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(0,0,0,.55); font-size: 18px; }

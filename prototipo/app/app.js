@@ -383,6 +383,154 @@ function dibujarPlano() {
 }
 window.addEventListener('resize', () => { dibujarPlano(); dibujarRecorrido(); });
 
+// ------------------------------------------------------------------------------------------------------------
+// Giro en el centro: la profundidad de la cámara, para sacar las paredes aunque haya muebles
+// ------------------------------------------------------------------------------------------------------------
+function invertir(m) {          // inversa de una matriz 4×4 (por columnas)
+  const a = m; const inv = new Float32Array(16);
+  inv[0] = a[5] * a[10] * a[15] - a[5] * a[11] * a[14] - a[9] * a[6] * a[15] + a[9] * a[7] * a[14] + a[13] * a[6] * a[11] - a[13] * a[7] * a[10];
+  inv[4] = -a[4] * a[10] * a[15] + a[4] * a[11] * a[14] + a[8] * a[6] * a[15] - a[8] * a[7] * a[14] - a[12] * a[6] * a[11] + a[12] * a[7] * a[10];
+  inv[8] = a[4] * a[9] * a[15] - a[4] * a[11] * a[13] - a[8] * a[5] * a[15] + a[8] * a[7] * a[13] + a[12] * a[5] * a[11] - a[12] * a[7] * a[9];
+  inv[12] = -a[4] * a[9] * a[14] + a[4] * a[10] * a[13] + a[8] * a[5] * a[14] - a[8] * a[6] * a[13] - a[12] * a[5] * a[10] + a[12] * a[6] * a[9];
+  inv[1] = -a[1] * a[10] * a[15] + a[1] * a[11] * a[14] + a[9] * a[2] * a[15] - a[9] * a[3] * a[14] - a[13] * a[2] * a[11] + a[13] * a[3] * a[10];
+  inv[5] = a[0] * a[10] * a[15] - a[0] * a[11] * a[14] - a[8] * a[2] * a[15] + a[8] * a[3] * a[14] + a[12] * a[2] * a[11] - a[12] * a[3] * a[10];
+  inv[9] = -a[0] * a[9] * a[15] + a[0] * a[11] * a[13] + a[8] * a[1] * a[15] - a[8] * a[3] * a[13] - a[12] * a[1] * a[11] + a[12] * a[3] * a[9];
+  inv[13] = a[0] * a[9] * a[14] - a[0] * a[10] * a[13] - a[8] * a[1] * a[14] + a[8] * a[2] * a[13] + a[12] * a[1] * a[10] - a[12] * a[2] * a[9];
+  inv[2] = a[1] * a[6] * a[15] - a[1] * a[7] * a[14] - a[5] * a[2] * a[15] + a[5] * a[3] * a[14] + a[13] * a[2] * a[7] - a[13] * a[3] * a[6];
+  inv[6] = -a[0] * a[6] * a[15] + a[0] * a[7] * a[14] + a[4] * a[2] * a[15] - a[4] * a[3] * a[14] - a[12] * a[2] * a[7] + a[12] * a[3] * a[6];
+  inv[10] = a[0] * a[5] * a[15] - a[0] * a[7] * a[13] - a[4] * a[1] * a[15] + a[4] * a[3] * a[13] + a[12] * a[1] * a[7] - a[12] * a[3] * a[5];
+  inv[14] = -a[0] * a[5] * a[14] + a[0] * a[6] * a[13] + a[4] * a[1] * a[14] - a[4] * a[2] * a[13] - a[12] * a[1] * a[6] + a[12] * a[2] * a[5];
+  inv[3] = -a[1] * a[6] * a[11] + a[1] * a[7] * a[10] + a[5] * a[2] * a[11] - a[5] * a[3] * a[10] - a[9] * a[2] * a[7] + a[9] * a[3] * a[6];
+  inv[7] = a[0] * a[6] * a[11] - a[0] * a[7] * a[10] - a[4] * a[2] * a[11] + a[4] * a[3] * a[10] + a[8] * a[2] * a[7] - a[8] * a[3] * a[6];
+  inv[11] = -a[0] * a[5] * a[11] + a[0] * a[7] * a[9] + a[4] * a[1] * a[11] - a[4] * a[3] * a[9] - a[8] * a[1] * a[7] + a[8] * a[3] * a[5];
+  inv[15] = a[0] * a[5] * a[10] - a[0] * a[6] * a[9] - a[4] * a[1] * a[10] + a[4] * a[2] * a[9] + a[8] * a[1] * a[6] - a[8] * a[2] * a[5];
+  let det = a[0] * inv[0] + a[1] * inv[4] + a[2] * inv[8] + a[3] * inv[12];
+  det = 1 / det;
+  for (let i = 0; i < 16; i++) inv[i] *= det;
+  return inv;
+}
+function porMatriz(m, x, y, z, w) {
+  return [m[0] * x + m[4] * y + m[8] * z + m[12] * w, m[1] * x + m[5] * y + m[9] * z + m[13] * w,
+    m[2] * x + m[6] * y + m[10] * z + m[14] * w, m[3] * x + m[7] * y + m[11] * z + m[15] * w];
+}
+
+const giro = { estancia: null, grabando: false, puntos: [], cubierto: new Array(36).fill(false), suelo: null, centro: [], sesion: null };
+
+$('#b-giro').onclick = async () => {
+  giro.estancia = (prompt('¿Qué habitación vas a probar?', 'Salón') || 'Estancia').trim();
+  estado.captura.nombre = $('#nombre').value.trim() || 'Mi casa';
+  Object.assign(giro, { grabando: false, puntos: [], cubierto: new Array(36).fill(false), suelo: null, centro: [] });
+  try {
+    const sesion = await navigator.xr.requestSession('immersive-ar', {
+      requiredFeatures: ['depth-sensing', 'hit-test'], optionalFeatures: ['dom-overlay'], domOverlay: { root: $('#giro') },
+      depthSensing: { usagePreference: ['cpu-optimized'], dataFormatPreference: ['luminance-alpha', 'float32'] },
+    });
+    giro.sesion = sesion;
+    mostrar('giro');
+    $('#g-estado').textContent = 'Ponte en el centro, apunta un momento al suelo y pulsa «Empezar a girar».';
+    $('#giro').addEventListener('beforexrselect', (e) => e.preventDefault());
+    const gl = document.createElement('canvas').getContext('webgl', { xrCompatible: true });
+    sesion.updateRenderState({ baseLayer: new XRWebGLLayer(sesion, gl) });
+    const ref = await sesion.requestReferenceSpace('local');
+    const viewer = await sesion.requestReferenceSpace('viewer');
+    const fuente = await sesion.requestHitTestSource({ space: viewer });
+    let n = 0;
+    const cuadro = (t, frame) => {
+      if (!giro.sesion) return;
+      sesion.requestAnimationFrame(cuadro);
+      const capa = sesion.renderState.baseLayer;
+      gl.bindFramebuffer(gl.FRAMEBUFFER, capa.framebuffer);
+      gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
+      const r = frame.getHitTestResults(fuente);
+      if (r.length) {
+        const y = r[0].getPose(ref).transform.position.y;
+        if (giro.suelo === null || y < giro.suelo) giro.suelo = y;      // el suelo: lo más bajo que se ha visto
+      }
+      const pose = frame.getViewerPose(ref);
+      if (!pose || !giro.grabando || ++n % 8) return;
+      const vista = pose.views[0];
+      const prof = frame.getDepthInformation(vista);
+      if (!prof) return;
+      const m = vista.transform.matrix;
+      const inv = invertir(vista.projectionMatrix);
+      giro.centro.push([m[12], -m[14]]);
+      const yaw = Math.atan2(-m[8], m[10]);                  // hacia dónde mira, en planta
+      giro.cubierto[Math.floor(((yaw + Math.PI) / (2 * Math.PI)) * 36) % 36] = true;
+      for (let j = 0; j < 36; j++) {
+        for (let i = 0; i < 48; i++) {
+          const u = (i + 0.5) / 48; const v = (j + 0.5) / 36;
+          const d = prof.getDepthInMeters(u, v);
+          if (!(d > 0.3 && d < 7)) continue;
+          const c = porMatriz(inv, 2 * u - 1, 1 - 2 * v, -1, 1);
+          const s = d / -(c[2] / c[3]);
+          const p = porMatriz(m, (c[0] / c[3]) * s, (c[1] / c[3]) * s, -d, 1);
+          giro.puntos.push([+p[0].toFixed(3), +(-p[2]).toFixed(3), +p[1].toFixed(3)]);
+        }
+      }
+      const hechos = giro.cubierto.filter(Boolean).length;
+      $('#g-estado').textContent = hechos < 36
+        ? `Gira despacio, mirando a las paredes y al techo: ${Math.round(hechos / 36 * 100)} % de la vuelta.`
+        : 'Vuelta completa. Puedes dar otra mirando más arriba, o pulsar «Terminar».';
+      pintarAnillo();
+    };
+    sesion.requestAnimationFrame(cuadro);
+    sesion.addEventListener('end', () => { giro.sesion = null; });
+  } catch (e) {
+    alert('Este móvil no da la profundidad de la cámara a la web: ' + e.message);
+  }
+};
+
+function pintarAnillo() {
+  const { g, w, h } = prepararLienzo($('#g-anillo'));
+  const r = Math.min(w, h) / 2 - 10;
+  giro.cubierto.forEach((ok, k) => {
+    const a0 = (k / 36) * 2 * Math.PI - Math.PI / 2; const a1 = a0 + (2 * Math.PI) / 36 - 0.03;
+    g.beginPath(); g.arc(w / 2, h / 2, r, a0, a1);
+    g.strokeStyle = ok ? '#5bb98c' : 'rgba(255,255,255,.35)'; g.lineWidth = 12; g.stroke();
+  });
+}
+
+$('#g-empezar').onclick = () => {
+  giro.grabando = !giro.grabando;
+  $('#g-empezar').textContent = giro.grabando ? 'Pausar' : 'Seguir girando';
+};
+$('#g-terminar').onclick = async () => {
+  giro.grabando = false;
+  if (giro.sesion) await giro.sesion.end().catch(() => {});
+  giro.sesion = null;
+  if (giro.puntos.length < 1000) { alert('Se han grabado muy pocos puntos: vuelve a probar girando más despacio.'); mostrar('inicio'); return; }
+  const xs = giro.centro.map((c) => c[0]); const ys = giro.centro.map((c) => c[1]);
+  const centro = [xs.reduce((a, b) => a + b, 0) / xs.length, ys.reduce((a, b) => a + b, 0) / ys.length];
+  try {
+    const r = await api('/api/barrido', { nombre: estado.captura.nombre, estancia: giro.estancia, puntos: giro.puntos, suelo: giro.suelo, centro });
+    mostrarResultado(r);
+  } catch (e) { alert('No se pudieron calcular las paredes: ' + e.message); mostrar('inicio'); }
+};
+
+function mostrarResultado(r) {
+  mostrar('resultado');
+  const e = r.esquinas;
+  const lados = e.map((p, i) => Math.hypot(e[(i + 1) % e.length][0] - p[0], e[(i + 1) % e.length][1] - p[1]));
+  $('#r-titulo').textContent = `${giro.estancia}: ${r.paredes.length} paredes`;
+  const coma = (x, d = 2) => x.toFixed(d).replace('.', ',');
+  $('#r-detalle').innerHTML = (lados.length ? `Lados: ${lados.map((l) => coma(l) + ' m').join(' · ')}<br>` : '')
+    + (r.altura ? `Altura libre: ${coma(r.altura)} m<br>` : 'No he visto el techo: mira más hacia arriba al girar.<br>')
+    + `Ruido de las paredes: ${r.paredes.map((p) => coma(p.rms_mm, 0)).join(' · ')} mm · ${r.usados} puntos útiles de ${r.total}`;
+  requestAnimationFrame(() => {
+    const { g, w, h } = prepararLienzo($('#r-plano'));
+    const todos = r.muestra.concat(e);
+    const v = encuadre(todos, w, h, 30);
+    const P = (p) => [v.ox + p[0] * v.escala, v.oy - p[1] * v.escala];
+    g.fillStyle = 'rgba(200,200,200,.45)';
+    for (const p of r.muestra) { const [x, y] = P(p); g.fillRect(x, y, 2, 2); }
+    g.strokeStyle = '#e4572e'; g.lineWidth = 3;
+    if (e.length > 2) { g.beginPath(); e.forEach((p, i) => (i ? g.lineTo(...P(p)) : g.moveTo(...P(p)))); g.closePath(); g.stroke(); }
+    g.strokeStyle = '#6fb3ff'; g.lineWidth = 1.5;
+    for (const p of r.paredes) { g.beginPath(); g.moveTo(...P(p.tramo[0])); g.lineTo(...P(p.tramo[1])); g.stroke(); }
+  });
+}
+$('#r-otra').onclick = () => mostrar('inicio');
+
 // Lo recorrido antes de un cierre inesperado
 try {
   const c = JSON.parse(localStorage.getItem('croquis-captura') || 'null');
