@@ -50,6 +50,12 @@
       <button id="b-planos">Sacar los planos</button>
       <div id="pdfs"></div>
     </section>
+    <section style="margin-top:28px;border-top:1px solid #3a3e46;padding-top:14px">
+      <label>Subir un fichero al PC (por ejemplo, el escaneo LiDAR exportado en PLY o E57)</label>
+      <input type="file" id="fichero">
+      <button class="a" id="b-fichero">Subir fichero</button>
+      <p class="s" id="e-fichero"></p>
+    </section>
   </aside>
 </main>
 <div id="ocupado" hidden><div id="ocupado-t">Calculando…</div></div>
@@ -132,6 +138,16 @@ $('#b-planos').onclick = async () => {
   } catch (e) { alert(e.message); }
 };
 window.addEventListener('resize', () => V && pintar());
+$('#b-fichero').onclick = () => {
+  const f = $('#fichero').files[0]; const e = $('#e-fichero');
+  if (!f) { e.textContent = 'Toca «Elegir archivo» y busca el fichero en Archivos.'; return; }
+  const x = new XMLHttpRequest();
+  x.open('POST', '/api/fichero?nombre=' + encodeURIComponent(f.name));
+  x.upload.onprogress = (ev) => { e.textContent = 'Subiendo… ' + Math.round(ev.loaded / ev.total * 100) + ' %'; };
+  x.onload = () => { const j = JSON.parse(x.responseText); e.textContent = j.ok ? `Subido: ${j.fichero} (${Math.round(j.bytes / 1e6)} MB). Ya está en el PC.` : 'Error: ' + (j.error || ''); };
+  x.onerror = () => { e.textContent = 'No se pudo subir: ¿mismo wifi que el PC?'; };
+  x.send(f);
+};
 const previo = new URLSearchParams(location.search).get('id');
 if (previo) fetch('/api/ipad?id=' + encodeURIComponent(previo)).then((r) => r.json()).then((j) => { if (!j.error) mostrar(j); });
 </script>
