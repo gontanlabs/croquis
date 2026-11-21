@@ -6,8 +6,9 @@
 
 const GR = {
   PASO: 0.25, GIRO: Math.cos((12 * Math.PI) / 180),        // un fotograma cada 25 cm o 12°
-  MAX_GIRO: (0.5 * Math.PI) / 180,                         // y solo si gira menos de 0,5° por cuadro (~15°/s)…
-  MAX_PASO: 0.012,                                         // …y avanza menos de 1,2 cm por cuadro (~0,35 m/s)
+  MAX_GIRO_S: 35,                                          // y solo si gira a menos de 35°/s…
+  MAX_PASO_S: 0.7,                                         // …y anda a menos de 0,7 m/s (paseo lento)
+  ESPERA_MS: 1200,                                         // si lleva más de esto sin poder, se admite el doble
   CELDA: 0.10,                                             // mapa en celdas de 10 cm
 };
 const gr = {
@@ -88,27 +89,41 @@ function grCuadro(t, frame) {
   const m = vista.transform.matrix;
   const pos = [m[12], m[13], m[14]];
   const f = [-m[8], -m[9], -m[10]];
-  // Velocidad de este cuadro (para que el fotograma salga nítido)
-  let giro = 0; let paso = 0;
+  // Velocidad real (por segundo, sea cual sea la frecuencia de cuadros), suavizada
   if (gr.previa) {
-    giro = Math.acos(Math.min(1, f[0] * gr.previa.f[0] + f[1] * gr.previa.f[1] + f[2] * gr.previa.f[2]));
-    paso = Math.hypot(pos[0] - gr.previa.pos[0], pos[1] - gr.previa.pos[1], pos[2] - gr.previa.pos[2]);
+    const dt = Math.max(1, t - gr.previa.t) / 1000;
+    const giro = (Math.acos(Math.min(1, f[0] * gr.previa.f[0] + f[1] * gr.previa.f[1] + f[2] * gr.previa.f[2])) * 180 / Math.PI) / dt;
+    const paso = Math.hypot(pos[0] - gr.previa.pos[0], pos[1] - gr.previa.pos[1], pos[2] - gr.previa.pos[2]) / dt;
+    gr.giroS = 0.7 * (gr.giroS || 0) + 0.3 * giro;
+    gr.pasoS = 0.7 * (gr.pasoS || 0) + 0.3 * paso;
   }
-  gr.previa = { f, pos };
+  gr.previa = { f, pos, t };
+  gr.conCamara = !!vista.camera;
+  if (gr.grabando && t - (gr.diag || 0) > 3000) {          // diagnóstico al PC cada 3 s
+    gr.diag = t;
+    registrar('grabacion', JSON.stringify({ giro_s: Math.round(gr.giroS), paso_s: +(gr.pasoS || 0).toFixed(2), camara: gr.conCamara,
+      ocupado: gr.ocupado, perdido: gr.perdido, fotogramas: gr.total, suelo: gr.suelo }));
+  }
   let aviso = '';
   if (gr.perdido) aviso = 'Posición perdida: vuelve a mirar algo ya grabado, despacio';
-  else if (gr.grabando && (giro > GR.MAX_GIRO * 1.6 || paso > GR.MAX_PASO * 1.6)) aviso = 'Más despacio';
-  $('#gr-aviso').textContent = aviso;
+  else if (!gr.conCamara) aviso = 'La cámara no da imagen';
   if (gr.grabando && !gr.perdido) {
     const ult = gr.ultima;
     const toca = !ult || Math.hypot(pos[0] - ult.pos[0], pos[2] - ult.pos[2]) >= GR.PASO
       || f[0] * ult.f[0] + f[1] * ult.f[1] + f[2] * ult.f[2] < GR.GIRO;
-    if (toca && !gr.ocupado && giro < GR.MAX_GIRO && paso < GR.MAX_PASO && vista.camera) {
+    if (!toca) gr.tocaDesde = t;
+    const factor = t - (gr.tocaDesde || t) > GR.ESPERA_MS ? 2 : 1;
+    const despacio = gr.giroS < GR.MAX_GIRO_S * factor && gr.pasoS < GR.MAX_PASO_S * factor;
+    if (toca && !despacio && factor === 2) aviso = aviso || 'Más despacio';
+    if (toca && despacio && !gr.ocupado && vista.camera) {
       grCapturar(vista, capa, frame, pos, f);
+      gr.tocaDesde = t;
     }
+    $('#gr-aviso').textContent = aviso;
     const r = gr.recorrido; const u = r[r.length - 1];
     if (!u || Math.hypot(pos[0] - u[0], -pos[2] - u[1]) > 0.05) r.push([pos[0], -pos[2]]);
   }
+  if (!gr.grabando) $('#gr-aviso').textContent = aviso;
   if (++gr.n % 3 === 0) grMapa(pos, f, vista);
 }
 
