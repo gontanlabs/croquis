@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Croquis · subir</title>
+<style>body{margin:0;background:#1b1d21;color:#eceae4;font:18px/1.4 system-ui,-apple-system,sans-serif;padding:28px;max-width:640px}
+h1{font-size:26px}input,button{font:inherit;width:100%;margin-top:14px;padding:16px;border-radius:12px;border:1px solid #3a3e46;background:#26292f;color:#eceae4}
+button{background:#e4572e;border-color:#e4572e;color:#fff;font-weight:600}.s{color:#9a9ca3}</style></head>
+<body><h1>Subir un fichero a Croquis</h1>
+<p class="s">Por ejemplo, la nube de puntos (PLY u OBJ) de un escaneo con LiDAR.</p>
+<input type="file" id="f"><button id="b">Subir</button><p id="e" class="s"></p>
+<script>
+document.getElementById('b').onclick = () => {
+  const f = document.getElementById('f').files[0]; const e = document.getElementById('e');
+  if (!f) { e.textContent = 'Elige un fichero.'; return; }
+  const x = new XMLHttpRequest();
+  x.open('POST', '/api/fichero?nombre=' + encodeURIComponent(f.name));
+  x.upload.onprogress = (ev) => { e.textContent = 'Subiendo… ' + Math.round(ev.loaded / ev.total * 100) + ' %'; };
+  x.onload = () => { const j = JSON.parse(x.responseText); e.textContent = j.ok ? 'Subido: ' + j.fichero + ' (' + Math.round(j.bytes / 1e6) + ' MB). Ya lo tengo en el PC.' : 'Error: ' + (j.error || ''); };
+  x.onerror = () => { e.textContent = 'No se pudo subir: ¿estás en el mismo wifi que el PC?'; };
+  x.send(f);
+};
+</script></body></html>

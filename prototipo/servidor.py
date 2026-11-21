@@ -86,6 +86,8 @@ class Manejador(SimpleHTTPRequestHandler):
             nombre = parse_qs(url.query).get('nombre', ['vivienda'])[0]
             f = carpeta(nombre) / 'datos.json'
             return self._json(json.loads(f.read_text(encoding='utf-8')) if f.exists() else None)
+        if url.path == '/subir':
+            self.send_response(302); self.send_header('Location', '/subir.html'); self.end_headers(); return
         if url.path == '/i':                   # dirección corta: el último escaneo del iPad
             ultimos = sorted(DATOS.glob('*/ipad/*/estado.json'), key=lambda f: f.stat().st_mtime)
             destino = '/ipad.html' + (f'?id={ultimos[-1].parent.relative_to(DATOS).as_posix()}' if ultimos else '')
@@ -118,6 +120,22 @@ class Manejador(SimpleHTTPRequestHandler):
 
     def do_POST(self):
         url = urlparse(self.path)
+        if url.path == '/api/fichero':        # cualquier fichero desde el iPad (p. ej. la nube de puntos de un escaneo LiDAR)
+            q = {k: v[0] for k, v in parse_qs(url.query).items()}
+            nombre = re.sub(r'[^A-Za-z0-9_.-]+', '_', q.get('nombre', 'fichero'))[:120] or 'fichero'
+            c = DATOS / 'subidas'
+            c.mkdir(parents=True, exist_ok=True)
+            destino = c / nombre
+            resto = int(self.headers.get('Content-Length', 0))
+            with destino.open('wb') as f:
+                while resto > 0:
+                    trozo = self.rfile.read(min(resto, 8 << 20))
+                    if not trozo:
+                        break
+                    f.write(trozo)
+                    resto -= len(trozo)
+            print('SUBIDO:', destino, destino.stat().st_size, flush=True)
+            return self._json({'ok': True, 'fichero': nombre, 'bytes': destino.stat().st_size})
         if url.path == '/api/escaneo':        # un zip de OpenPlan3D Capture (puede pesar cientos de MB): a disco a trozos
             return self._escaneo(url)
         if url.path == '/api/medida':          # respuesta a una medida guiada de un escaneo del iPad
