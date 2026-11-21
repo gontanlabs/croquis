@@ -66,3 +66,18 @@ Por qué: los primeros intentos (esquina a esquina, giro con profundidad, fotos 
 
 **Camino comercial posible:** vídeo o fotos → VGGT-1B-Commercial (geometría) → paredes por encima de los muebles
 (`prototipo/barrido.py`) o RoomFormer si su licencia lo permite → medidas guiadas → planos.
+
+## 6. Pruebas en el comedor de Jose (2026-11-21)
+
+| Captura | Método | Resultado |
+|---|---|---|
+| 108 fotos desde 2 puntos fijos (app, realidad aumentada) | COLMAP con posiciones del móvil | 351 puntos; fotos movidas y sin desplazamiento: no sirve |
+| Las mismas 30 | VGGT | nube a trozos: no sirve |
+| Vídeo normal, 0,6×, andando, 61 s | COLMAP sin posiciones | 10 trozos sin unir |
+| Grabación andando en la app (realidad aumentada), 26 fotogramas | COLMAP con posiciones | 215 puntos: los fotogramas de la realidad aumentada salen movidos y con poco detalle |
+| **Vídeo normal, 24 fotogramas nítidos** | **VGGT**, escala con la altura medida (2,47 m) | **forma del comedor correcta; 3,92 × 3,68 m frente a 4,12 × 3,48 m reales (~5 %)** |
+
+Conclusión: la captura que funciona es un vídeo normal y nítido andando; la geometría, VGGT; la escala, una medida de
+láser. Un ~5 % es nivel de croquis (CubiCasa anuncia 95–97 %); las cotas exactas las da después el láser.
+Pendiente: usar todo el vídeo por tandas (8 GB de memoria gráfica: ~25 fotogramas cada vez), detectar las paredes
+sin confundirlas con muebles o con lo que se ve por una puerta, y una app de captura guiada que grabe vídeo normal.
