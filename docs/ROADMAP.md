@@ -1,6 +1,6 @@
 # Roadmap — Croquis
 
-Última actualización: 2026-11-21 (vivienda completa con un piso inventado; a la espera de la casa de Jose).
+Última actualización: 2026-11-21 (diseño completo en `docs/DISENO.md`, a revisar por Jose; C-011 y C-012).
 
 ## Estado
 
@@ -14,6 +14,11 @@ unida por las jambas de las puertas (con la jamba a escuadra, ±3 mm) y las dos 
 con la primera vuelta del protocolo cada estancia cierra a ±4,2 mm y la casa entera a ±10,7 mm (error real 11,7 mm):
 lo que queda es el grosor de los tabiques sin puerta, que no se puede medir desde dentro. Láminas EA.01 (distribución),
 EA.02 (cotas), EA.03 (alzado interior) y EA.04 (sección), impresas con AutoCAD y revisadas.
+
+**Tarde del 2026-11-21:** escaneo de la casa de Jose con el iPad (OpenPlan3D Capture) y del salón con SiteScape
+(nube LiDAR); la nube se encaja con la planta y ve techo a 2,48 m, la diagonal falsa y el hueco de arriba a la derecha.
+La corrección automática (`detectar.py`, cambios sin guardar en git) **no es fiable** todavía. Jose pidió parar los
+parches (C-011): diseño en `docs/DISENO.md`, banco de pruebas con ARKitScenes antes de seguir.
 
 ## Lo que se sabe (investigación del 2026-11-21)
 
@@ -61,9 +66,13 @@ servidor y app web de pruebas en Android (descartada como captura).
   capas, cajetín. Propuesta de Claude: Croquis escribe dentro de una copia de la plantilla, que cada estudio carga.
 - Al traspasar: si se reescribe la autoría de los commits; si sale en el portfolio (con permiso de VLANC).
 
+## Siguiente paso
+
+Que Jose revise `docs/DISENO.md` (sobre todo los criterios de aceptación); después, el banco de pruebas con ARKitScenes.
+
 ## Pendiente de Jose
 
-1. Medir su casa con el protocolo de campo (en la conversación del 2026-11-21 y en `prototipo/README.md`).
+1. Revisar `docs/DISENO.md`.
 
 ## Procesos abiertos
 

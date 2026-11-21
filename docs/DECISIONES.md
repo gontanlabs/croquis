@@ -59,3 +59,18 @@ aprobar va a «Por decidir» del roadmap.
 - Sus diferencias (Dunford, pasos 4–5; Christensen, el «trabajo» como progreso en una situación): planos en la plantilla
   de cada estudio, precisión comprobada con láser donde importa, serie completa del estado actual.
 - Pendiente para venderlo: generar los PDF sin AutoCAD, aplicando las plumillas del estudio.
+
+**C-011 · 2026-11-21 · Una herramienta para cualquier tipo de casa, no para un caso.**
+- Jose, mientras Claude corregía el salón de su casa: «no se si vas a sacar el comedor o corregir la planta pero desde
+  luego sera para un caso aislado, te estas centrando en algo concreto cuando lo que queremos es una herramienta tan
+  versatil como cualquier tipo de casa». Y: «estas haciendo chapuzas, monton sobre monton».
+- Consecuencia: se para el código y se escribe el diseño (`docs/DISENO.md`), con un catálogo de casos y una
+  comprobación con referencia láser en muchas habitaciones antes de dar nada por bueno.
+
+**C-012 · 2026-11-21 · Esta fase, sin pagar: servidor local y apps que ya existen; SiteScape solo para datos de prueba.**
+- Jose: «para probar con navegador hace falta pagar desarrollo?? no podemos hacerlo con el metodo que estamos siguiendo
+  del localhost???????????». Antes: «por que no podemos usar una app de codigo abierto en vez de una de codigo cerrado
+  para ponernos mas facil luego el camino?». Claude propuso Stray Scanner (abierta, MIT); Jose: «stray scanner es una
+  mierda». Ante seguir con SiteScape solo como fuente de datos de prueba (exporta PLY, nada depende de ella): «vale».
+- La app propia (Expo, cuenta de desarrollador de Apple, 99 €/año) se decide cuando el sistema funcione con este
+  método.
