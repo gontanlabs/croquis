@@ -8,7 +8,8 @@
 // en horizontal y cada 35° en vertical, para que cada foto se solape con las vecinas (COLMAP necesita puntos comunes).
 const ANILLOS = [[0, 18, 0], [35, 14, 10], [-35, 14, 10], [68, 8, 0]];
 const ACIERTO = Math.cos((6 * Math.PI) / 180);                               // a menos de 6° del objetivo
-const QUIETO = Math.cos((0.7 * Math.PI) / 180);                              // menos de 0,7° entre cuadros
+const QUIETO = Math.cos((0.12 * Math.PI) / 180);                             // menos de 0,12° entre cuadros (~4°/s)
+const QUIETO_MS = 500;                                                        // y así durante medio segundo: foto nítida
 
 const esc = {
   sesion: null, gl: null, binding: null, ref: null, fb: null,
@@ -156,8 +157,12 @@ function cuadro(t, frame) {
   const m = vista.transform.matrix;
   const f = adelante(m);
   if (esc.hab && esc.yaw0 === null) esc.yaw0 = Math.atan2(f[0], -f[2]);     // el primer objetivo, de frente
-  const quieto = esc.previo ? punto3(f, esc.previo) > QUIETO : false;
-  esc.previo = f;
+  const pos0 = [m[12], m[13], m[14]];
+  const sinGiro = esc.previo ? punto3(f, esc.previo) > QUIETO : false;
+  const sinMover = esc.prevPos ? Math.hypot(pos0[0] - esc.prevPos[0], pos0[1] - esc.prevPos[1], pos0[2] - esc.prevPos[2]) < 0.002 : false;
+  if (!(sinGiro && sinMover)) esc.quietoDesde = t;
+  const quieto = t - (esc.quietoDesde || t) > QUIETO_MS;
+  esc.previo = f; esc.prevPos = pos0;
   if (!esc.hab) return;
   if (esc.esperandoPunto) {                                    // segundo punto: cuando se haya separado 80 cm
     const [x0, z0] = esc.esperandoPunto.desde;
@@ -212,8 +217,14 @@ function cuadro(t, frame) {
       g.fillStyle = 'rgba(255,255,255,.92)'; g.fill(); g.restore();
     }
   }
-  // Centro de la pantalla
+  // Centro de la pantalla y, si apunta a un objetivo, el anillo que se llena mientras está quieto
   g.beginPath(); g.arc(w / 2, h / 2, 6, 0, 7); g.fillStyle = '#e4572e'; g.fill();
+  if (mejor && mejor.c > ACIERTO) {
+    const prog = Math.min(1, (t - (esc.quietoDesde || t)) / QUIETO_MS);
+    g.beginPath(); g.arc(w / 2, h / 2, 22, -Math.PI / 2, -Math.PI / 2 + prog * 2 * Math.PI);
+    g.strokeStyle = '#5bb98c'; g.lineWidth = 5; g.stroke();
+    if (prog < 1) $('#e-pista').textContent = 'quieto…';
+  }
   // Foto automática: apuntando a un objetivo pendiente y quieto
   if (mejor && mejor.c > ACIERTO && quieto && !esc.perdido && !esc.ocupado && t - esc.ultima > 350 && vista.camera) {
     esc.ultima = t;

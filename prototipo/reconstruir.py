@@ -79,21 +79,24 @@ def _cuaternion(R):
 
 def reconstruir(casa: Path, denso=False, escaneo=None):
     casa = Path(casa).resolve()
-    captura, modelo = casa / 'captura', casa / 'modelo'
+    captura, modelo = casa / 'captura', casa / f'modelo-{escaneo or "todo"}'
     fotos = _fotos(captura, escaneo)
     print(f'{len(fotos)} fotos', flush=True)
     if modelo.exists():
-        shutil.rmtree(modelo)
-    modelo.mkdir()
+        shutil.rmtree(modelo, ignore_errors=True)
+    modelo.mkdir(exist_ok=True)
     imagenes = modelo / 'imagenes'
-    imagenes.mkdir()
+    imagenes.mkdir(exist_ok=True)
+    for viejo in ('database.db', 'conocido', 'disperso', 'denso'):
+        if (modelo / viejo).exists():
+            raise RuntimeError(f'No se puede borrar {modelo / viejo}: ciérralo si está abierto')
     for f in fotos:
         shutil.copy2(captura / f['fichero'], imagenes / f['fichero'])
     fx, fy, cx, cy = _intrinsecos(fotos[0])
     db = modelo / 'database.db'
     _colmap('feature_extractor', '--database_path', db, '--image_path', imagenes,
             '--ImageReader.single_camera', 1, '--ImageReader.camera_model', 'PINHOLE',
-            '--ImageReader.camera_params', f'{fx},{fy},{cx},{cy}', '--FeatureExtraction.use_gpu', 1)
+            '--ImageReader.camera_params', f'{fx},{fy},{cx},{cy}', '--FeatureExtraction.use_gpu', 0)   # la extracción por GPU devolvía 0 puntos en muchas fotos
     _colmap('exhaustive_matcher', '--database_path', db, '--FeatureMatching.use_gpu', 1)
     # Modelo «conocido»: las posiciones del móvil, con los números que COLMAP ha dado a cada imagen
     con = sqlite3.connect(db)
