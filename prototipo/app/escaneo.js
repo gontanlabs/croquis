@@ -4,9 +4,10 @@
 // (seguimiento de ARCore), todas en el mismo sistema de coordenadas: las habitaciones quedan unidas solas.
 // Las fotos se guardan en el móvil (IndexedDB) y se suben al PC en cuanto se puede.
 
-// [inclinación, cuántos, desfase]. En vertical la cámara abarca unos 33° de ancho y 66° de alto: objetivos cada 20°
-// en horizontal y cada 35° en vertical, para que cada foto se solape con las vecinas (COLMAP necesita puntos comunes).
-const ANILLOS = [[0, 18, 0], [35, 14, 10], [-35, 14, 10], [68, 8, 0]];
+// [inclinación, cuántos, desfase]. En vertical la cámara abarca unos 33° de ancho y 66° de alto: objetivos cada 24°
+// en horizontal (las fotos se solapan ~9°, lo justo para que COLMAP encuentre puntos comunes); el suelo, con menos.
+const ANILLOS = [[0, 15, 0], [35, 12, 15], [-32, 8, 0], [66, 5, 0]];
+const PANO_W = 720; const PANO_H = 360;                                      // panorámica en directo
 const ACIERTO = Math.cos((6 * Math.PI) / 180);                               // a menos de 6° del objetivo
 const QUIETO = Math.cos((0.12 * Math.PI) / 180);                             // menos de 0,12° entre cuadros (~4°/s)
 const QUIETO_MS = 500;                                                        // y así durante medio segundo: foto nítida
@@ -98,7 +99,13 @@ function elegirHabitacion() {
   }
   $('#e-estado').textContent = '¿En qué habitación estás? Ponte en un sitio desde el que se vea casi todo.';
 }
+function nuevaPano() {
+  const c = document.createElement('canvas'); c.width = PANO_W; c.height = PANO_H;
+  const g = c.getContext('2d'); g.fillStyle = '#2a2d33'; g.fillRect(0, 0, PANO_W, PANO_H);
+  esc.pano = c; esc.panoDatos = g.getImageData(0, 0, PANO_W, PANO_H); esc.panoPeso = new Float32Array(PANO_W * PANO_H);
+}
 function empezarPunto(hab, punto) {
+  nuevaPano();
   $('#e-chips').innerHTML = '';
   esc.hab = hab; esc.punto = punto; esc.fotosPunto = []; esc.yaw0 = null;
   prepararObjetivos();
@@ -261,6 +268,7 @@ function capturar(vista, objetivo, capa) {
       const fila = w * 4;
       for (let y = 0; y < h; y++) img.data.set(px.subarray((h - 1 - y) * fila, (h - y) * fila), y * fila);
       c.putImageData(img, 0, 0);
+      coserEnPano(lienzo, meta);
       const jpeg = await new Promise((ok) => lienzo.toBlob(ok, 'image/jpeg', 0.88));
       await almacen.poner({ fichero: `${esc.nombre}-${meta.fichero}`, jpeg, meta: { ...meta, fichero: meta.fichero } });
     } catch (e) { registrar('foto', e); } finally { esc.ocupado = false; }
@@ -268,20 +276,51 @@ function capturar(vista, objetivo, capa) {
   }, 0);
 }
 
+function coserEnPano(lienzo, meta) {
+  if (!esc.pano) return;
+  const pw = 120; const ph = Math.round((pw * meta.alto) / meta.ancho);          // la foto, pequeña
+  const pc = document.createElement('canvas'); pc.width = pw; pc.height = ph;
+  pc.getContext('2d').drawImage(lienzo, 0, 0, pw, ph);
+  const src = pc.getContext('2d').getImageData(0, 0, pw, ph).data;
+  const M = meta.vista; const P = meta.proyeccion; const out = esc.panoDatos.data;
+  for (let j = 0; j < PANO_H; j++) {
+    const lat = Math.PI / 2 - ((j + 0.5) / PANO_H) * Math.PI;
+    const cl = Math.cos(lat); const sl = Math.sin(lat);
+    for (let i = 0; i < PANO_W; i++) {
+      const lon = ((i + 0.5) / PANO_W) * 2 * Math.PI - Math.PI;
+      const dx = cl * Math.sin(lon); const dy = sl; const dz = -cl * Math.cos(lon);
+      const cx = M[0] * dx + M[1] * dy + M[2] * dz;            // a ejes de la cámara: R^T · d
+      const cy = M[4] * dx + M[5] * dy + M[6] * dz;
+      const cz = M[8] * dx + M[9] * dy + M[10] * dz;
+      if (cz > -1e-3) continue;
+      const nx = (P[0] * cx + P[8] * cz) / -cz; const ny = (P[5] * cy + P[9] * cz) / -cz;
+      if (nx <= -1 || nx >= 1 || ny <= -1 || ny >= 1) continue;
+      const peso = (1 - nx * nx) * (1 - ny * ny);
+      const k = j * PANO_W + i;
+      if (peso <= esc.panoPeso[k]) continue;                    // se queda la foto que lo vio más de frente
+      esc.panoPeso[k] = peso;
+      const u = Math.floor((nx * 0.5 + 0.5) * (pw - 1)); const v = Math.floor((1 - (ny * 0.5 + 0.5)) * (ph - 1));
+      const a = (v * pw + u) * 4; const b = k * 4;
+      out[b] = src[a]; out[b + 1] = src[a + 1]; out[b + 2] = src[a + 2]; out[b + 3] = 255;
+    }
+  }
+  esc.pano.getContext('2d').putImageData(esc.panoDatos, 0, 0);
+}
+
 function pintarMapa(pr) {
   const { g, w, h } = prepararLienzo($('#e-mapa'));
-  if (!esc.hab) return;
-  const fx = 2 * Math.atan(1 / pr[0]) * (180 / Math.PI); const fy = 2 * Math.atan(1 / pr[5]) * (180 / Math.PI);
-  const X = (yaw) => (((yaw % 360) + 360) % 360) / 360 * w; const Y = (incl) => (90 - incl) / 180 * h;
-  g.fillStyle = 'rgba(91,185,140,.45)';
+  if (!esc.hab || !esc.pano) return;
+  g.drawImage(esc.pano, 0, 0, w, h);
+  const X = (lonRad) => ((((lonRad + Math.PI) / (2 * Math.PI)) % 1 + 1) % 1) * w;
+  const Y = (incl) => ((90 - incl) / 180) * h;
   for (const o of esc.objetivos) {
-    if (!o.hecho) continue;
-    const x0 = X(o.yaw - fx / 2); const ww = (fx / 360) * w; const y0 = Y(o.incl + fy / 2); const hh = (fy / 180) * h;
-    g.fillRect(x0, y0, ww, hh);
-    if (x0 + ww > w) g.fillRect(x0 - w, y0, ww, hh);
+    const lon = esc.yaw0 === null ? 0 : esc.yaw0 + (o.yaw * Math.PI) / 180;
+    g.beginPath(); g.arc(X(lon), Y(o.incl), o.hecho ? 2 : 3.5, 0, 7);
+    if (o.hecho) { g.fillStyle = 'rgba(91,185,140,.9)'; g.fill(); } else { g.strokeStyle = '#fff'; g.lineWidth = 1.5; g.stroke(); }
   }
-  for (const o of esc.objetivos) {
-    g.beginPath(); g.arc(X(o.yaw), Y(o.incl), 2.5, 0, 7); g.fillStyle = o.hecho ? '#5bb98c' : '#fff'; g.fill();
+  if (esc.previo) {                                            // hacia dónde miras ahora
+    const f = esc.previo; const lon = Math.atan2(f[0], -f[2]); const lat = (Math.asin(f[1]) * 180) / Math.PI;
+    g.strokeStyle = '#e4572e'; g.lineWidth = 2; g.strokeRect(X(lon) - 7, Y(lat) - 12, 14, 24);
   }
 }
 
