@@ -172,6 +172,26 @@ function cuadro(t, frame) {
     g.beginPath(); g.arc(x, y, o.hecho ? 9 : 16, 0, 7);
     if (o.hecho) { g.fillStyle = 'rgba(91,185,140,.85)'; g.fill(); } else { g.strokeStyle = '#fff'; g.lineWidth = 3; g.stroke(); }
   }
+  // Hacia dónde ir: flecha al objetivo pendiente más cercano (o línea, si ya está en pantalla)
+  if (mejor) {
+    const d = direccion(mejor.o);
+    const v = porMatriz(inv, pos[0] + d[0] * 2, pos[1] + d[1] * 2, pos[2] + d[2] * 2, 1);
+    const clip = porMatriz(pr, v[0], v[1], v[2], 1);
+    const enPantalla = clip[3] > 0 && Math.abs(clip[0] / clip[3]) < 0.85 && Math.abs(clip[1] / clip[3]) < 0.85;
+    let dx = v[0]; let dy = -v[1];
+    const L = Math.hypot(dx, dy) || 1; dx /= L; dy /= L;
+    if (enPantalla) {
+      const x = ((clip[0] / clip[3]) * 0.5 + 0.5) * w; const y = (1 - ((clip[1] / clip[3]) * 0.5 + 0.5)) * h;
+      g.setLineDash([8, 8]); g.strokeStyle = 'rgba(255,255,255,.8)'; g.lineWidth = 3;
+      g.beginPath(); g.moveTo(w / 2, h / 2); g.lineTo(x, y); g.stroke(); g.setLineDash([]);
+    } else {
+      const r = Math.min(w, h) * 0.22; const cx = w / 2 + dx * r; const cy = h / 2 + dy * r;
+      const a = Math.atan2(dy, dx);
+      g.save(); g.translate(cx, cy); g.rotate(a);
+      g.beginPath(); g.moveTo(34, 0); g.lineTo(-14, -26); g.lineTo(-4, 0); g.lineTo(-14, 26); g.closePath();
+      g.fillStyle = 'rgba(255,255,255,.92)'; g.fill(); g.restore();
+    }
+  }
   // Centro de la pantalla
   g.beginPath(); g.arc(w / 2, h / 2, 6, 0, 7); g.fillStyle = '#e4572e'; g.fill();
   // Foto automática: apuntando a un objetivo pendiente y quieto
