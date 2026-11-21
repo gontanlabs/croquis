@@ -136,7 +136,7 @@ def reconstruir(casa: Path, denso=False, escaneo=None):
 def leer_ply(ruta: Path):
     """Puntos (x, y, z) de un PLY binario o de texto que escribe COLMAP."""
     datos = ruta.read_bytes()
-    fin = datos.index(b'end_header') + len(b'end_header\n')
+    fin = datos.index(b'\n', datos.index(b'end_header')) + 1      # vale para \n y para \r\n
     cab = datos[:fin].decode('ascii', 'ignore').splitlines()
     n = next(int(l.split()[2]) for l in cab if l.startswith('element vertex'))
     props = [l.split() for l in cab if l.startswith('property')]

@@ -74,7 +74,8 @@ def _girar(p, ang):
     return np.array([c * p[0] - s * p[1], s * p[0] + c * p[1]])
 
 
-def importar(r, desplazar=(0.0, 0.0)):
+def importar(r, desplazar=(0.0, 0.0), correcciones=None):
+    """`correcciones`: lo que detecta `detectar.paredes` (huecos y salientes por pared), para aplicarlo solo."""
     ang = _orientacion(r)
     suelo = min(_T(f)[1, 3] for f in r['floors']) if r.get('floors') else None
     paredes = {}
@@ -144,7 +145,10 @@ def importar(r, desplazar=(0.0, 0.0)):
     for n, cara in estancias.items():
         hs = [p.alto for p in lista if cara.exterior.buffer(0.08).intersects(p.linea())]
         alturas[n] = float(np.median(hs)) if hs else 2.5
-    return _Planta(r, ang, suelo, lista, paredes, estancias, alturas, desplazar)
+    pl = _Planta(r, ang, suelo, lista, paredes, estancias, alturas, desplazar)
+    if correcciones:
+        pl.aplicar(r, ang, correcciones, desplazar)
+    return pl
 
 
 def _lados_rect(pol):
@@ -314,6 +318,38 @@ class _Planta:
         self.exterior = Polygon(unary_union(list(self.estancias.values()) + [macizo_bruto]).buffer(0.01).exterior)
         self.p = {}
         self.viv = type('V', (), {'datos': {'estancias': {n: {'altura': round(alturas[n], 3)} for n in self.estancias}}})()
+
+    def aplicar(self, r, ang, correcciones, desplazar):
+        """Huecos: se suman a la estancia de al lado (entrando en el muro); salientes (pilares): se restan."""
+        from shapely.geometry import Polygon as Pol
+        dx, dy = desplazar
+        por_id = {w['identifier']: w for w in r['walls']}
+        self.aplicadas = []
+        for c in correcciones:
+            w = por_id.get(c['pared'])
+            if not w or not c.get('tramos'):
+                continue
+            T = _T(w); centro = T[:3, 3]; u = T[:3, 0]; L = w['dimensions'][0]
+            a3 = centro - u * L / 2
+            for tr in c['tramos']:
+                p1 = _girar((a3 + u * tr['desde'])[[0, 2]] * [1, -1], ang) + [dx, dy]
+                p2 = _girar((a3 + u * (tr['desde'] + tr['ancho']))[[0, 2]] * [1, -1], ang) + [dx, dy]
+                d = p2 - p1; d = d / np.linalg.norm(d); n = np.array([-d[1], d[0]])
+                m = (p1 + p2) / 2
+                est = min(self.estancias.items(), key=lambda kv: kv[1].distance(Point(*m)))
+                dentro = n if est[1].contains(Point(*(m + n * 0.15))) else -n
+                f = tr['fondo']
+                if tr['tipo'] == 'hueco':        # hacia fuera de la estancia, dentro del muro
+                    rect = Pol([tuple(p1 + dentro * 0.06), tuple(p2 + dentro * 0.06), tuple(p2 - dentro * (0.06 + f)),
+                                tuple(p1 - dentro * (0.06 + f))])
+                    self.estancias[est[0]] = _mayor(est[1].union(rect.buffer(0)))
+                    self.macizo = self.macizo.difference(rect)
+                else:                            # pilar o saliente: hacia dentro de la estancia
+                    rect = Pol([tuple(p1 - dentro * 0.06), tuple(p2 - dentro * 0.06), tuple(p2 + dentro * f),
+                                tuple(p1 + dentro * f)])
+                    self.estancias[est[0]] = _mayor(est[1].difference(rect))
+                    self.macizo = self.macizo.union(rect)
+                self.aplicadas.append({'estancia': est[0], **tr})
 
     def resumen(self):
         return {n: (round(c.area, 2)) for n, c in self.estancias.items()}
