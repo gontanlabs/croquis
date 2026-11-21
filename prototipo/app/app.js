@@ -569,3 +569,32 @@ try {
   if (c && c.estancias && c.estancias.length) estado.captura = c;
 } catch (e) { /* nada guardado */ }
 inicio();
+
+// ------------------------------------------------------------------------------------------------------------
+// Prueba: la cámara gran angular (0,6×) con la cámara normal del navegador (sin realidad aumentada)
+// ------------------------------------------------------------------------------------------------------------
+$('#b-angular').onclick = async () => {
+  const t = $('#t-angular');
+  try {
+    // Primero, permiso con cualquier cámara trasera (sin permiso, el navegador no dice los nombres)
+    const previa = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    previa.getTracks().forEach((x) => x.stop());
+    const camaras = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === 'videoinput');
+    registrar('camaras', JSON.stringify(camaras.map((c) => c.label)));
+    // La gran angular es la cámara 2 del móvil («camera2 2»)
+    const ga = camaras.find((c) => /camera2 2\b/.test(c.label)) || camaras.find((c) => /wide|angular|0\.6/i.test(c.label));
+    if (!ga) { t.textContent = 'Chrome no ofrece la gran angular. Cámaras: ' + camaras.map((c) => c.label).join(' · '); return; }
+    const flujo = await navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: ga.deviceId }, width: { ideal: 4000 }, height: { ideal: 3000 } } });
+    const v = $('#v-angular'); v.srcObject = flujo; v.style.display = 'block'; await v.play();
+    const ajustes = flujo.getVideoTracks()[0].getSettings();
+    t.textContent = `Abierta: ${ga.label} · ${ajustes.width}×${ajustes.height}. Apunta a una habitación: en 3 segundos hago una foto y te la mando al PC.`;
+    await new Promise((ok) => setTimeout(ok, 3000));
+    const c = document.createElement('canvas'); c.width = v.videoWidth; c.height = v.videoHeight;
+    c.getContext('2d').drawImage(v, 0, 0);
+    const jpeg = await new Promise((ok) => c.toBlob(ok, 'image/jpeg', 0.9));
+    await fetch(`/api/foto?nombre=prueba-angular&fichero=angular-${Date.now()}.jpg`, { method: 'POST', body: jpeg });
+    registrar('angular', JSON.stringify({ label: ga.label, ajustes, video: [v.videoWidth, v.videoHeight] }));
+    t.textContent = `Foto hecha (${v.videoWidth}×${v.videoHeight}) y enviada al PC.`;
+    flujo.getTracks().forEach((x) => x.stop()); v.style.display = 'none';
+  } catch (e) { registrar('angular', e); t.textContent = 'Error: ' + e.message; }
+};
