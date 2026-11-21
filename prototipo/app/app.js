@@ -463,7 +463,22 @@ $('#b-giro').onclick = async () => {
         if (giro.suelo === null || y < giro.suelo) giro.suelo = y;      // el suelo: lo más bajo que se ha visto
       }
       const pose = frame.getViewerPose(ref);
-      if (!pose || !giro.grabando || ++n % 8) return;
+      if (!pose) return;
+      // Comprobación: distancia al punto de la cruz según la profundidad y según el seguimiento (hit-test)
+      if (!giro.grabando && ++n % 10 === 0) {
+        const pv = frame.getDepthInformation(pose.views[0]);
+        const dProf = pv ? pv.getDepthInMeters(0.5, 0.5) : null;
+        let dSeg = null;
+        if (r.length) {
+          const a = r[0].getPose(ref).transform.position; const b = pose.transform.position;
+          dSeg = Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z);
+        }
+        const f = (x) => (x ? x.toFixed(3).replace('.', ',') + ' m' : '—');
+        $('#g-estado').textContent = `Apunta a una pared: profundidad ${f(dProf)} · seguimiento ${f(dSeg)}. Mídelo con el láser desde el móvil.`;
+        if (n % 60 === 0) registrar('comprobacion', JSON.stringify({ dProf, dSeg }));
+        return;
+      }
+      if (!giro.grabando || ++n % 8) return;
       const vista = pose.views[0];
       const prof = frame.getDepthInformation(vista);
       if (!prof) return;
