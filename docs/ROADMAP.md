@@ -68,7 +68,9 @@ servidor y app web de pruebas en Android (descartada como captura).
 
 ## Siguiente paso
 
-Que Jose revise `docs/DISENO.md` (sobre todo los criterios de aceptación); después, el banco de pruebas con ARKitScenes.
+Banco de pruebas con ARKitScenes en marcha (Jose: «si tienes un metodo vamos con el»); primeros resultados en
+`docs/DISENO.md` › Resultados del banco: el LiDAR del iPad mide ~2 cm corto (corregible) y el paso 3 aún no cumple.
+Siguiente: corregir ese sesgo, el caso de cristales y espejos, y más casas.
 
 ## Pendiente de Jose
 
@@ -76,4 +78,6 @@ Que Jose revise `docs/DISENO.md` (sobre todo los criterios de aceptación); desp
 
 ## Procesos abiertos
 
-Ninguno.
+- Servidor local de Croquis en la red (`prototipo/servidor.py --red`), arrancado en la sesión del 2026-11-21 para subir
+  desde el iPad: pararlo al cerrar la sesión.
+- Datos del banco en `levantamientos/arkitscenes/` (unos 2 GB, fuera del repo): se pueden borrar y volver a bajar.

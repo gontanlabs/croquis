@@ -84,6 +84,32 @@ En cada pared de cada estancia, sin nada particular de una casa:
 - **Paso 4:** planta final a ±5 mm en las cotas que se acotan, con el menor número de medidas. Se cuenta cuántas pide
   por estancia.
 
+## Resultados del banco (2026-11-21, primera tanda)
+
+Código en `prototipo/banco/` (`arkit.py`: nubes y error del sensor; `faro.py`: muestra del láser Faro y su encaje en el
+sistema del iPad; `paso3.py`: prueba del paso 3 con el esqueleto simulado). Datos en `levantamientos/arkitscenes/`,
+fuera del repo. Tres escaneos de casas distintas (42444946, 42444966, 42445021).
+
+- **El LiDAR del iPad mide corto, unos 2 cm, en las tres casas** (fotograma a fotograma, frente a la profundidad del
+  láser en el mismo fotograma; no depende de la posición): −15 a −22 mm hasta 1 m, −19 a −21 mm de 1 a 2 m, −23 a
+  −28 mm de 2 a 3 m. Cada cara de pared queda unos 2 cm hacia dentro, así que las estancias salen unos 4 cm pequeñas.
+  Cuadra con el comedor de Jose: SiteScape da 4,03 m y el láser 4,12 m. **Se puede corregir**: es un sesgo, no ruido;
+  una medida de láser por estancia lo calibra. Pendiente: confirmarlo en más casas.
+- **Paso 3 (cara real de cada pared), contra el Faro en dos casas:** da lo mismo sea cual sea el error de partida del
+  esqueleto (±15 cm, ±3°). Error mediano de 12 a 24 mm; entre el 47 y el 60 % de las paredes a 2 cm o menos. **No
+  cumple** el criterio (95 %). Los fallos grandes (+94 y −119 mm) son superficies que el iPad ve por detrás de la cara
+  real (cristal, espejo o un hueco que el Faro no ve): el «pico más exterior» se va a ellas.
+- **Límite del propio banco:** la referencia tiene alrededor de 1 cm de incertidumbre. El encaje del Faro con la parte
+  del láser proyectada en los fotogramas del iPad da una mediana de 11–13 mm de punto a plano, y en la primera casa el
+  encaje falla (78 cm de altura); esa casa queda fuera hasta arreglarlo.
+- **Lo que esto dice del método:** el LiDAR del iPad, solo, da del orden de ±2 cm, no ±5 mm, como ya decían los
+  estudios. Su papel es la forma y los detalles (huecos, pilares, techos), corregir RoomPlan y decidir qué pocas medidas
+  de láser hacen falta. Los ±5 mm salen del láser.
+
+**Siguiente, por este orden:** corregir el sesgo de 2 cm y volver a medir; que el paso 3 no se vaya a superficies vistas
+a través de cristales o espejos (exigir que la cara llegue al techo o al suelo y sea continua); arreglar el encaje de la
+primera casa; bajar más casas (el banco ya es automático) hasta tener decenas de paredes por caso del catálogo.
+
 ## Orden de trabajo
 
 1. Descargar unos pocos escaneos de ARKitScenes, variados y con referencia láser, y montar el banco de pruebas, que
