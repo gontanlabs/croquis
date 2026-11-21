@@ -30,3 +30,10 @@ aprobar va a «Por decidir» del roadmap.
 - Jose (09:34, mientras Claude trabajaba): «en cuanto al laser tengo un bosch glm 40-31, no se si se puede conectar de
   alguna manera, no creo, pero mas bien deberiamos dejar que cada usuario elija su modo de medir?». Claude estuvo de
   acuerdo: cada medida guarda su origen y su margen, y el ajuste da más peso a las fiables.
+
+**C-006 · 2026-11-21 · Alzados: interiores siempre; exteriores, solo en vivienda unifamiliar.**
+- Jose: «los alzados suelen ser interiores pero tambien serian exteriores si es una vivienda unifamilair, en el caso de
+  pisos o apartamentos no es tan importante porque no se va a tocar la fachada».
+
+**C-007 · 2026-11-21 · Secciones: las suficientes para que se entienda todo y no quede ninguna medida por obtener.**
+- Jose: «en cuanto al numero las suficientes para que se entienda todo y no se queden medidas por obtener, claro».

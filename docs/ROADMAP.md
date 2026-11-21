@@ -45,15 +45,11 @@
 - Identificador Android neutro (ni `com.gontanlabs…` ni `com.vlanc…`, o ya el de VLANC).
 - ✅ Plumillas (`docs/PLUMILLAS.md`) y plantilla del estudio (`docs/PLANTILLA.md`): láminas EA.01–EA.05 en A3 a 1/50,
   capas, cajetín. Propuesta de Claude: Croquis escribe dentro de una copia de la plantilla, que cada estudio carga.
-- ¿El alzado es la fachada o también los alzados interiores? ¿Cuántas secciones se hacen?
 - Al traspasar: si se reescribe la autoría de los commits; si sale en el portfolio (con permiso de VLANC).
 
 ## Pendiente de Jose
 
-1. El repo se creó en la cuenta personal (`gontanreig/croquis`): transferirlo a la organización `gontanlabs`
-   (https://github.com/gontanreig/croquis/settings, «Transfer ownership»). Claude lo sube después por SSH.
-2. Decir si el alzado del estado actual es la fachada o también los interiores, y cuántas secciones se hacen.
-3. Decir si se prueba magicplan antes de programar.
+1. Decir si se prueba magicplan antes de programar.
 
 ## Procesos abiertos
 

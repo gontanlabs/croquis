@@ -53,8 +53,8 @@ Cajetín: bloque `Cajetin_VLANC_A3`, con los atributos `NUM`, `ESCALA`, `DD/MM/A
   el código neutro (`../CLAUDE.md`) y sirve a cualquier estudio.
 - El PDF aplica las mismas plumillas para salir como un plano impreso en el estudio.
 
-## Preguntas abiertas
+## Alzados y secciones (C-006, C-007)
 
-- ¿El alzado de estado actual es la fachada o también los alzados interiores de cada pared (cocina, baños)? Cambia
-  mucho lo que hay que medir.
-- ¿Dónde y cuántas secciones se hacen normalmente?
+- Alzados **interiores** siempre (cada pared que haga falta: cocina, baños…); **exteriores** solo en unifamiliares.
+- Secciones: las suficientes para que se entienda todo y no quede ninguna medida por obtener. Croquis puede avisar de
+  lo que ninguna sección explica todavía (cambios de altura de techo, vigas, escalones).
