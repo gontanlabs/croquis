@@ -86,6 +86,13 @@ class Manejador(SimpleHTTPRequestHandler):
             nombre = parse_qs(url.query).get('nombre', ['vivienda'])[0]
             f = carpeta(nombre) / 'datos.json'
             return self._json(json.loads(f.read_text(encoding='utf-8')) if f.exists() else None)
+        if url.path == '/i':                   # dirección corta: el último escaneo del iPad
+            ultimos = sorted(DATOS.glob('*/ipad/*/estado.json'), key=lambda f: f.stat().st_mtime)
+            destino = '/ipad.html' + (f'?id={ultimos[-1].parent.relative_to(DATOS).as_posix()}' if ultimos else '')
+            self.send_response(302)
+            self.send_header('Location', destino)
+            self.end_headers()
+            return
         if url.path == '/api/ipad':            # un escaneo del iPad ya subido (para retomarlo)
             import ipad
             ident = parse_qs(url.query).get('id', [''])[0]
