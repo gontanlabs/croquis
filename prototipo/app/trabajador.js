@@ -25,9 +25,9 @@ self.onmessage = async (e) => {
   const lienzo = new OffscreenCanvas(w, h);
   lienzo.getContext('2d').putImageData(img, 0, 0);
   const jpeg = await lienzo.convertToBlob({ type: 'image/jpeg', quality: 0.88 });
-  coser(lienzo, meta);
+  if (m.pano !== false) coser(lienzo, meta);
   self.postMessage({ tipo: 'foto', jpeg, meta });
-  enviarPano();
+  if (m.pano !== false) enviarPano();
 };
 
 function enviarPano() {

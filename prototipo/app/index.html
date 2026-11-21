@@ -16,12 +16,15 @@
   <label class="campo">Nombre del levantamiento
     <input id="nombre" type="text" value="Mi casa" autocomplete="off">
   </label>
-  <button id="b-angular" class="grande accion">Probar la cámara gran angular (0,6×)</button>
-  <video id="v-angular" playsinline muted style="width:100%;border-radius:10px;display:none"></video>
-  <p id="t-angular" class="nota"></p>
-  <button id="b-escanear" class="grande secundario">Escanear la casa (cámara normal)</button>
+  <button id="b-grabar" class="grande accion">Grabar la casa</button>
+  <p class="nota">Recorre cada habitación despacio: su perímetro y una vuelta por el centro, mirando paredes y techo.
+  El mapa de arriba te enseña lo que ya está visto.</p>
   <p id="e-pendientes" class="nota"></p>
   <details class="nota"><summary>Otras pruebas</summary>
+    <button id="b-escanear" class="grande secundario">Escanear desde puntos fijos</button>
+    <button id="b-angular" class="grande secundario">Probar la cámara gran angular (0,6×)</button>
+    <video id="v-angular" playsinline muted style="width:100%;border-radius:10px;display:none"></video>
+    <p id="t-angular" class="nota"></p>
     <button id="b-ar" class="grande secundario">Recorrer marcando esquinas</button>
     <button id="b-giro" class="grande secundario">Girar en el centro (profundidad)</button>
   </details>
@@ -45,6 +48,18 @@
     <button id="b-ventana">Ventana</button>
     <button id="b-deshacer">Deshacer</button>
     <button id="b-terminar" class="fin">Terminar</button>
+  </div>
+</section>
+
+<!-- Grabación andando: fotogramas con su posición y mapa en directo de lo visto -->
+<section id="grabar" class="pantalla">
+  <canvas id="g-mapa"></canvas>
+  <div class="barra-arriba"><span id="gr-estado">Pulsa «Empezar» y recorre la casa despacio.</span><br><small id="gr-cuenta"></small></div>
+  <div id="gr-aviso"></div>
+  <div id="gr-chips" class="chips"></div>
+  <div class="barra-abajo dos">
+    <button id="gr-empezar" class="accion">Empezar</button>
+    <button id="gr-terminar" class="fin">Terminar</button>
   </div>
 </section>
 
@@ -109,5 +124,6 @@
 <div id="ocupado" hidden><div>Calculando…</div></div>
 <script src="app.js"></script>
 <script src="escaneo.js"></script>
+<script src="grabacion.js"></script>
 </body>
 </html>
