@@ -43,15 +43,16 @@
 - Tecnología de la app (lenguaje y librerías de Android, del ajuste y de la salida DXF/PDF): Claude la propone al
   empezar la prueba A.
 - Identificador Android neutro (ni `com.gontanlabs…` ni `com.vlanc…`, o ya el de VLANC).
-- **Capas del estado actual:** las plumillas (grosor por color) ya están (`docs/PLUMILLAS.md`); falta qué se dibuja con
-  cada color (muro seccionado, tabiques, carpintería, cotas, textos…): lo dice Jose o se lee de un DWG del estudio.
+- ✅ Plumillas (`docs/PLUMILLAS.md`) y plantilla del estudio (`docs/PLANTILLA.md`): láminas EA.01–EA.05 en A3 a 1/50,
+  capas, cajetín. Propuesta de Claude: Croquis escribe dentro de una copia de la plantilla, que cada estudio carga.
+- ¿El alzado es la fachada o también los alzados interiores? ¿Cuántas secciones se hacen?
 - Al traspasar: si se reescribe la autoría de los commits; si sale en el portfolio (con permiso de VLANC).
 
 ## Pendiente de Jose
 
 1. El repo se creó en la cuenta personal (`gontanreig/croquis`): transferirlo a la organización `gontanlabs`
    (https://github.com/gontanreig/croquis/settings, «Transfer ownership»). Claude lo sube después por SSH.
-2. Decir qué se dibuja con cada color en un estado actual, o pasar un DWG del estudio para leer sus capas.
+2. Decir si el alzado del estado actual es la fachada o también los interiores, y cuántas secciones se hacen.
 3. Decir si se prueba magicplan antes de programar.
 
 ## Procesos abiertos
