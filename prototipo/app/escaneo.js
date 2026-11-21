@@ -45,7 +45,7 @@ async function subirPendientes() {
   try {
     const pendientes = await almacen.todas();
     for (const f of pendientes) {
-      const q = `nombre=${encodeURIComponent(f.meta.levantamiento)}&fichero=${encodeURIComponent(f.fichero)}`;
+      const q = `nombre=${encodeURIComponent(f.meta.levantamiento)}&fichero=${encodeURIComponent(f.meta.fichero)}`;
       const r = await fetch('/api/foto?' + q, { method: 'POST', body: f.jpeg });
       if (!r.ok) throw new Error('foto ' + r.status);
       const m = await fetch('/api/captura', { method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -113,6 +113,7 @@ function contar() {
 
 $('#b-escanear').onclick = async () => {
   esc.nombre = $('#nombre').value.trim() || 'Mi casa';
+  esc.idEscaneo = Date.now().toString(36);          // que un escaneo nuevo no pise las fotos de otro
   try {
     const sesion = await navigator.xr.requestSession('immersive-ar', {
       requiredFeatures: ['camera-access'], optionalFeatures: ['dom-overlay'], domOverlay: { root: $('#escaneo') },
@@ -215,7 +216,7 @@ function capturar(vista, objetivo, capa) {
   esc.total++;
   const n = String(esc.total).padStart(4, '0');
   const meta = {
-    levantamiento: esc.nombre, fichero: `${n}.jpg`, habitacion: esc.hab, punto: esc.punto, n: esc.total,
+    levantamiento: esc.nombre, fichero: `${esc.idEscaneo}-${n}.jpg`, escaneo: esc.idEscaneo, habitacion: esc.hab, punto: esc.punto, n: esc.total,
     objetivo: [objetivo.yaw, objetivo.incl], hora: Date.now(), ancho: w, alto: h,
     vista: Array.from(vista.transform.matrix), proyeccion: Array.from(vista.projectionMatrix),
   };
