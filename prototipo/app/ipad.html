@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Croquis · iPad</title>
+<style>
+  :root { --f:#1b1d21; --p:#26292f; --t:#eceae4; --s:#9a9ca3; --a:#e4572e; --ok:#5bb98c; --b:#3a3e46; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; background: var(--f); color: var(--t); font: 17px/1.4 system-ui, -apple-system, sans-serif; }
+  main { display: grid; grid-template-columns: 1fr 380px; height: 100%; }
+  @media (orientation: portrait) { main { grid-template-columns: 1fr; grid-template-rows: 55% 45%; } }
+  #plano { width: 100%; height: 100%; background: #f6f5f1; }
+  aside { padding: 20px; overflow-y: auto; border-left: 1px solid var(--b); }
+  h1 { font-size: 24px; margin: 0 0 4px; } .s { color: var(--s); font-size: 14px; }
+  label { display: block; margin: 14px 0 6px; color: var(--s); font-size: 14px; }
+  input[type=text], input[inputmode] { width: 100%; padding: 14px; font: inherit; font-size: 24px; color: var(--t);
+    background: var(--p); border: 1px solid var(--b); border-radius: 12px; }
+  button { width: 100%; padding: 15px; margin-top: 10px; font: inherit; color: var(--t); background: var(--p);
+    border: 1px solid var(--b); border-radius: 12px; }
+  button.a { background: var(--a); border-color: var(--a); color: #fff; font-weight: 600; }
+  #tarea h2 { font-size: 21px; margin: 16px 0 4px; }
+  #pdfs a { display: block; padding: 12px; margin: 6px 0; border-radius: 10px; background: var(--p); color: var(--t); text-decoration: none; }
+  .barra { height: 8px; border-radius: 4px; background: var(--p); margin-top: 12px; } .barra i { display: block; height: 100%; border-radius: 4px; background: var(--ok); }
+  #ocupado { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(0,0,0,.6); font-size: 20px; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <svg id="plano"></svg>
+  <aside>
+    <h1>Croquis</h1>
+    <div class="s">Estado actual desde un escaneo del iPad</div>
+    <section id="subir">
+      <label>Nombre de la vivienda <input type="text" id="nombre" value="Mi casa"></label>
+      <label>Zip exportado de OpenPlan3D Capture (la captura completa)</label>
+      <input type="file" id="zip" accept=".zip">
+      <button class="a" id="b-subir">Subir el escaneo</button>
+      <p class="s" id="progreso"></p>
+    </section>
+    <section id="tarea" hidden>
+      <div class="s" id="cuenta"></div>
+      <div class="barra"><i id="avance" style="width:0"></i></div>
+      <h2 id="t-texto"></h2>
+      <p class="s" id="t-ayuda"></p>
+      <div id="t-numero"><input inputmode="decimal" id="valor" placeholder="0,000"><button class="a" id="b-guardar">Guardar</button></div>
+      <div id="t-opciones"></div>
+      <button id="b-saltar">Saltar</button>
+      <button id="b-planos">Sacar los planos</button>
+      <div id="pdfs"></div>
+    </section>
+  </aside>
+</main>
+<div id="ocupado" hidden><div id="ocupado-t">Calculando…</div></div>
+<script>
+'use strict';
+const $ = (s) => document.querySelector(s);
+let V = null; let i = 0;
+async function api(ruta, cuerpo, texto) {
+  $('#ocupado-t').textContent = texto || 'Calculando…'; $('#ocupado').hidden = false;
+  try {
+    const r = await fetch(ruta, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(cuerpo) });
+    const j = await r.json(); if (j.error) throw new Error(j.error); return j;
+  } finally { $('#ocupado').hidden = true; }
+}
+$('#b-subir').onclick = () => {
+  const f = $('#zip').files[0]; if (!f) { alert('Elige el zip'); return; }
+  const x = new XMLHttpRequest();
+  x.open('POST', '/api/escaneo?nombre=' + encodeURIComponent($('#nombre').value.trim() || 'Mi casa'));
+  x.upload.onprogress = (e) => { $('#progreso').textContent = `Subiendo… ${Math.round(e.loaded / e.total * 100)} %`; };
+  x.onload = () => {
+    const j = JSON.parse(x.responseText);
+    if (j.error) { alert(j.error); return; }
+    $('#progreso').textContent = ''; mostrar(j);
+  };
+  x.onerror = () => alert('No se pudo subir: ¿estás en el mismo wifi que el PC?');
+  x.send(f);
+};
+function mostrar(v) {
+  V = v; i = 0; $('#subir').hidden = true; $('#tarea').hidden = false; pintar();
+}
+function tarea() { return V.tareas.length ? V.tareas[i % V.tareas.length] : null; }
+function pintar() {
+  const t = tarea();
+  $('#cuenta').textContent = `${V.hechas} de ${V.total} medidas`;
+  $('#avance').style.width = (V.hechas / V.total * 100) + '%';
+  if (!t) { $('#t-texto').textContent = 'Todas las medidas hechas'; $('#t-ayuda').textContent = 'Saca los planos.'; $('#t-numero').hidden = true; $('#t-opciones').innerHTML = ''; }
+  else {
+    $('#t-texto').textContent = t.texto; $('#t-ayuda').textContent = t.ayuda || '';
+    $('#t-numero').hidden = t.tipo !== 'numero'; $('#valor').value = '';
+    $('#t-opciones').innerHTML = '';
+    if (t.tipo === 'opcion') t.opciones.forEach((o) => { const b = document.createElement('button'); b.textContent = o; b.onclick = () => responder(o); $('#t-opciones').appendChild(b); });
+  }
+  dibujar(t);
+}
+function dibujar(t) {
+  const svg = $('#plano'); const W = svg.clientWidth; const H = svg.clientHeight;
+  const todos = Object.values(V.estancias).flat();
+  const xs = todos.map((p) => p[0]); const ys = todos.map((p) => p[1]);
+  const x0 = Math.min(...xs) - 0.6; const x1 = Math.max(...xs) + 0.6; const y0 = Math.min(...ys) - 0.6; const y1 = Math.max(...ys) + 0.6;
+  const e = Math.min(W / (x1 - x0), H / (y1 - y0));
+  const ox = (W - e * (x1 - x0)) / 2; const oy = (H - e * (y1 - y0)) / 2;
+  const P = (p) => `${ox + (p[0] - x0) * e},${oy + (y1 - p[1]) * e}`;
+  let h = '';
+  for (const [n, pol] of Object.entries(V.estancias)) {
+    const act = t && t.estancia === n;
+    h += `<polygon points="${pol.map(P).join(' ')}" fill="${act ? 'rgba(228,87,46,.12)' : '#fff'}"/>`;
+    const cx = pol.reduce((s, p) => s + p[0], 0) / pol.length; const cy = pol.reduce((s, p) => s + p[1], 0) / pol.length;
+    h += `<text x="${P([cx, cy]).split(',')[0]}" y="${P([cx, cy]).split(',')[1]}" font-size="12" text-anchor="middle" fill="${act ? '#b23a16' : '#666'}">${n}</text>`;
+  }
+  for (const pol of V.macizo) h += `<polygon points="${pol.map(P).join(' ')}" fill="#9a9a9a" stroke="#333" stroke-width="1"/>`;
+  for (const p of V.puertas) h += `<line x1="${P(p[0]).split(',')[0]}" y1="${P(p[0]).split(',')[1]}" x2="${P(p[1]).split(',')[0]}" y2="${P(p[1]).split(',')[1]}" stroke="#2e9e6a" stroke-width="5"/>`;
+  for (const v of V.ventanas) h += `<line x1="${P(v[0]).split(',')[0]}" y1="${P(v[0]).split(',')[1]}" x2="${P(v[1]).split(',')[0]}" y2="${P(v[1]).split(',')[1]}" stroke="#3b82f6" stroke-width="5"/>`;
+  if (t && t.segmento) {
+    const [a, b] = t.segmento;
+    h += `<line x1="${P(a).split(',')[0]}" y1="${P(a).split(',')[1]}" x2="${P(b).split(',')[0]}" y2="${P(b).split(',')[1]}" stroke="#e4572e" stroke-width="5" marker-end="url(#f)" marker-start="url(#f)"/>`;
+  }
+  svg.innerHTML = `<defs><marker id="f" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><circle cx="4" cy="4" r="3.5" fill="#e4572e"/></marker></defs>` + h;
+}
+async function responder(valor) {
+  const t = tarea(); if (!t) return;
+  try { V = await api('/api/medida', { id: V.id, tarea: t.id, valor }); i = 0; pintar(); } catch (e) { alert(e.message); }
+}
+$('#b-guardar').onclick = () => { const v = parseFloat($('#valor').value.replace(',', '.')); if (v > 0 && v < 50) responder(v); };
+$('#valor').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('#b-guardar').click(); });
+$('#b-saltar').onclick = () => { i++; pintar(); };
+$('#b-planos').onclick = async () => {
+  try {
+    const r = await api('/api/planos-ipad', { id: V.id }, 'Sacando los planos (un minuto)…');
+    $('#pdfs').innerHTML = r.pdfs.map((u) => `<a href="${u}" target="_blank">${decodeURIComponent(u.split('/').pop())}</a>`).join('');
+  } catch (e) { alert(e.message); }
+};
+window.addEventListener('resize', () => V && pintar());
+const previo = new URLSearchParams(location.search).get('id');
+if (previo) fetch('/api/ipad?id=' + encodeURIComponent(previo)).then((r) => r.json()).then((j) => { if (!j.error) mostrar(j); });
+</script>
+</body>
+</html>

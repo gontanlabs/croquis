@@ -1,4 +1,4 @@
-"""Servidor local de la app de Croquis (solo en este PC: 127.0.0.1).
+"""Servidor local de la app de Croquis (solo en este PC: 127.0.0.1; con --red, también en el wifi de casa).
 
 El móvil llega por el cable USB con `adb reverse tcp:8765 tcp:8765` y abre http://localhost:8765 (la cámara en
 realidad aumentada exige una dirección segura, y localhost lo es). Cada respuesta se guarda en
@@ -39,6 +39,25 @@ def guardar(datos):
     return c
 
 
+def _escaneo_a_disco(manejador, url):
+    import ipad
+    q = {k: v[0] for k, v in parse_qs(url.query).items()}
+    resto = int(manejador.headers.get('Content-Length', 0))
+    tmp = DATOS / '_subida.zip'
+    with tmp.open('wb') as f:
+        while resto > 0:
+            trozo = manejador.rfile.read(min(resto, 8 << 20))
+            if not trozo:
+                break
+            f.write(trozo)
+            resto -= len(trozo)
+    try:
+        return manejador._json(ipad.recibir(DATOS, tmp, q.get('nombre', 'vivienda')))
+    except Exception as e:
+        traceback.print_exc()
+        return manejador._json({'error': f'{type(e).__name__}: {e}'}, 500)
+
+
 class Manejador(SimpleHTTPRequestHandler):
     def __init__(self, *a, **k):
         super().__init__(*a, directory=str(APP), **k)
@@ -58,17 +77,27 @@ class Manejador(SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(cuerpo)
 
+    def _escaneo(self, url):
+        return _escaneo_a_disco(self, url)
+
     def do_GET(self):
         url = urlparse(self.path)
         if url.path == '/api/datos':
             nombre = parse_qs(url.query).get('nombre', ['vivienda'])[0]
             f = carpeta(nombre) / 'datos.json'
             return self._json(json.loads(f.read_text(encoding='utf-8')) if f.exists() else None)
+        if url.path == '/api/ipad':            # un escaneo del iPad ya subido (para retomarlo)
+            import ipad
+            ident = parse_qs(url.query).get('id', [''])[0]
+            try:
+                return self._json(ipad.vista(DATOS, ident))
+            except Exception as e:
+                return self._json({'error': f'{type(e).__name__}: {e}'}, 404)
         if url.path == '/api/levantamientos':
             return self._json(sorted(p.parent.name for p in DATOS.glob('*/datos.json')))
         if url.path.startswith('/planos/'):
             _, _, nombre, fichero = unquote(url.path).split('/', 3)
-            f = DATOS / nombre / fichero
+            f = DATOS / nombre / fichero                  # fichero puede llevar subcarpetas (escaneos del iPad)
             if f.suffix == '.pdf' and f.exists() and DATOS in f.resolve().parents:
                 cuerpo = f.read_bytes()
                 self.send_response(200)
@@ -82,6 +111,20 @@ class Manejador(SimpleHTTPRequestHandler):
 
     def do_POST(self):
         url = urlparse(self.path)
+        if url.path == '/api/escaneo':        # un zip de OpenPlan3D Capture (puede pesar cientos de MB): a disco a trozos
+            return self._escaneo(url)
+        if url.path == '/api/medida':          # respuesta a una medida guiada de un escaneo del iPad
+            pedido = json.loads(self.rfile.read(int(self.headers.get('Content-Length', 0))) or b'{}')
+            import ipad
+            return self._json(ipad.responder(DATOS, pedido))
+        if url.path == '/api/planos-ipad':
+            pedido = json.loads(self.rfile.read(int(self.headers.get('Content-Length', 0))) or b'{}')
+            import ipad
+            try:
+                return self._json(ipad.planos(DATOS, pedido['id']))
+            except Exception as e:
+                traceback.print_exc()
+                return self._json({'error': f'{type(e).__name__}: {e}'}, 500)
         if url.path == '/api/foto':           # una foto del escaneo (JPEG en el cuerpo)
             q = {k: v[0] for k, v in parse_qs(url.query).items()}
             c = carpeta(q.get('nombre', 'vivienda')) / 'captura'
@@ -133,5 +176,6 @@ class Manejador(SimpleHTTPRequestHandler):
 
 if __name__ == '__main__':
     DATOS.mkdir(exist_ok=True)
-    print(f'Croquis en http://localhost:{PUERTO}')
-    ThreadingHTTPServer(('127.0.0.1', PUERTO), Manejador).serve_forever()
+    red = '--red' in sys.argv                       # también desde el iPad, en el wifi de casa
+    print(f'Croquis en http://localhost:{PUERTO}' + (' y en la red de casa' if red else ''))
+    ThreadingHTTPServer(('0.0.0.0' if red else '127.0.0.1', PUERTO), Manejador).serve_forever()
