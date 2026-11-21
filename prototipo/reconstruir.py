@@ -30,12 +30,12 @@ def _colmap(*args):
     subprocess.run([str(exe), *map(str, args)], check=True)
 
 
-def _fotos(captura: Path):
+def _fotos(captura: Path, escaneo=None):
     fotos = {}
     for linea in (captura / 'fotos.jsonl').read_text(encoding='utf-8').splitlines():
         if linea.strip():
             f = json.loads(linea)
-            if (captura / f['fichero']).exists():
+            if (captura / f['fichero']).exists() and (escaneo is None or f.get('escaneo') == escaneo):
                 fotos[f['fichero']] = f
     return [fotos[k] for k in sorted(fotos)]
 
@@ -77,10 +77,10 @@ def _cuaternion(R):
     return q / np.linalg.norm(q)
 
 
-def reconstruir(casa: Path, denso=False):
+def reconstruir(casa: Path, denso=False, escaneo=None):
     casa = Path(casa).resolve()
     captura, modelo = casa / 'captura', casa / 'modelo'
-    fotos = _fotos(captura)
+    fotos = _fotos(captura, escaneo)
     print(f'{len(fotos)} fotos', flush=True)
     if modelo.exists():
         shutil.rmtree(modelo)
@@ -143,4 +143,5 @@ def leer_ply(ruta: Path):
 
 
 if __name__ == '__main__':
-    reconstruir(Path(sys.argv[1]), '--denso' in sys.argv)
+    esc = next((a.split('=', 1)[1] for a in sys.argv if a.startswith('--escaneo=')), None)
+    reconstruir(Path(sys.argv[1]), '--denso' in sys.argv, esc)

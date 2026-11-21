@@ -69,7 +69,12 @@ h1 { margin: 24px 0 0; font-size: 34px; letter-spacing: -.5px; }
 #e-lienzo { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 #e-mapa { position: absolute; right: 10px; top: 70px; width: 46vw; height: 23vw; border-radius: 8px;
   background: rgba(20, 22, 26, .7); pointer-events: none; }
-#escaneo .barra-abajo { grid-template-columns: 1fr 1fr 1fr; }
+#escaneo .barra-abajo { grid-template-columns: 1fr 1fr 1fr; padding-bottom: max(56px, env(safe-area-inset-bottom)); }
+#escaneo .barra-arriba { padding-top: max(44px, env(safe-area-inset-top)); }
+#escaneo .chips { bottom: 170px; }
+#e-pista { position: absolute; left: 0; right: 0; top: 58%; text-align: center; font-size: 20px; font-weight: 600;
+  text-shadow: 0 1px 4px rgba(0,0,0,.8); pointer-events: none; }
+#e-mapa { top: 110px; }
 details summary { margin: 14px 0 4px; cursor: pointer; }
 #giro { position: relative; background: transparent; }
 #g-anillo { position: absolute; left: 50%; top: 50%; width: 220px; height: 220px; margin: -110px 0 0 -110px; }

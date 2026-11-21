@@ -159,6 +159,16 @@ function cuadro(t, frame) {
   const quieto = esc.previo ? punto3(f, esc.previo) > QUIETO : false;
   esc.previo = f;
   if (!esc.hab) return;
+  if (esc.esperandoPunto) {                                    // segundo punto: cuando se haya separado 80 cm
+    const [x0, z0] = esc.esperandoPunto.desde;
+    const dist = Math.hypot(m[12] - x0, m[14] - z0);
+    $('#e-cuenta').textContent = `Te has movido ${dist.toFixed(1).replace('.', ',')} m`;
+    if (dist < 0.8) return;
+    esc.esperandoPunto = null;
+    empezarPunto(esc.hab, esc.punto + 1);
+    if (navigator.vibrate) navigator.vibrate([40, 60, 40]);
+    return;
+  }
   // Objetivos en pantalla
   const inv = vista.transform.inverse.matrix; const pr = vista.projectionMatrix;
   const pos = [m[12], m[13], m[14]];
@@ -182,7 +192,14 @@ function cuadro(t, frame) {
     const clip = porMatriz(pr, v[0], v[1], v[2], 1);
     const enPantalla = clip[3] > 0 && Math.abs(clip[0] / clip[3]) < 0.85 && Math.abs(clip[1] / clip[3]) < 0.85;
     let dx = v[0]; let dy = -v[1];
+    if (v[2] > 0) dx = dx >= 0 ? 1 : -1, dy = 0;          // detrás: girar hacia el lado más corto
     const L = Math.hypot(dx, dy) || 1; dx /= L; dy /= L;
+    if (!esc.perdido && !esc.esperandoPunto) {
+      const pista = enPantalla ? 've al círculo y quédate quieto'
+        : Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'gira a la derecha →' : '← gira a la izquierda')
+          : (dy < 0 ? 'apunta más arriba ↑' : 'apunta más abajo ↓');
+      $('#e-pista').textContent = pista;
+    }
     if (enPantalla) {
       const x = ((clip[0] / clip[3]) * 0.5 + 0.5) * w; const y = (1 - ((clip[1] / clip[3]) * 0.5 + 0.5)) * h;
       g.setLineDash([8, 8]); g.strokeStyle = 'rgba(255,255,255,.8)'; g.lineWidth = 3;
@@ -257,8 +274,14 @@ function pintarMapa(pr) {
   }
 }
 
-$('#e-punto').onclick = () => { if (esc.hab) empezarPunto(esc.hab, esc.punto + 1); };
-$('#e-habitacion').onclick = () => { esc.hab = null; elegirHabitacion(); contar(); };
+$('#e-punto').onclick = () => {
+  if (!esc.hab || !esc.fotosPunto.length) return;
+  const m = esc.fotosPunto.map((f) => [f.vista[12], f.vista[14]]);
+  esc.esperandoPunto = { desde: [m.reduce((a, b) => a + b[0], 0) / m.length, m.reduce((a, b) => a + b[1], 0) / m.length] };
+  $('#e-pista').textContent = '';
+  $('#e-estado').textContent = `${esc.hab}: muévete 1 o 2 m a otro sitio de la habitación. Empezará solo.`;
+};
+$('#e-habitacion').onclick = () => { esc.esperandoPunto = null; esc.hab = null; elegirHabitacion(); contar(); };
 $('#e-terminar').onclick = async () => {
   if (esc.sesion) await esc.sesion.end().catch(() => {});
   esc.sesion = null; esc.hab = null;
