@@ -112,8 +112,10 @@ def reconstruir(casa: Path, denso=False):
     (conocido / 'points3D.txt').write_text('')
     disperso = modelo / 'disperso'
     disperso.mkdir()
+    # Las posiciones del móvil tienen algún milímetro y décima de grado de error: se admite algo más de desvío
     _colmap('point_triangulator', '--database_path', db, '--image_path', imagenes, '--input_path', conocido,
-            '--output_path', disperso)
+            '--output_path', disperso, '--Mapper.filter_max_reproj_error', 8, '--Mapper.tri_complete_max_reproj_error', 8,
+            '--Mapper.tri_merge_max_reproj_error', 8)
     _colmap('model_converter', '--input_path', disperso, '--output_path', disperso / 'puntos.ply',
             '--output_type', 'PLY')
     if denso:

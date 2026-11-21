@@ -4,7 +4,9 @@
 // (seguimiento de ARCore), todas en el mismo sistema de coordenadas: las habitaciones quedan unidas solas.
 // Las fotos se guardan en el móvil (IndexedDB) y se suben al PC en cuanto se puede.
 
-const ANILLOS = [[0, 12, 0], [40, 8, 22.5], [-40, 8, 22.5], [72, 4, 45]];    // [inclinación, cuántos, desfase]
+// [inclinación, cuántos, desfase]. En vertical la cámara abarca unos 33° de ancho y 66° de alto: objetivos cada 20°
+// en horizontal y cada 35° en vertical, para que cada foto se solape con las vecinas (COLMAP necesita puntos comunes).
+const ANILLOS = [[0, 18, 0], [35, 14, 10], [-35, 14, 10], [68, 8, 0]];
 const ACIERTO = Math.cos((6 * Math.PI) / 180);                               // a menos de 6° del objetivo
 const QUIETO = Math.cos((0.7 * Math.PI) / 180);                              // menos de 0,7° entre cuadros
 
