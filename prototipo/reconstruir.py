@@ -97,7 +97,11 @@ def reconstruir(casa: Path, denso=False, escaneo=None):
     _colmap('feature_extractor', '--database_path', db, '--image_path', imagenes,
             '--ImageReader.single_camera', 1, '--ImageReader.camera_model', 'PINHOLE',
             '--ImageReader.camera_params', f'{fx},{fy},{cx},{cy}', '--FeatureExtraction.use_gpu', 0)   # la extracción por GPU devolvía 0 puntos en muchas fotos
-    _colmap('exhaustive_matcher', '--database_path', db, '--FeatureMatching.use_gpu', 1)
+    if len(fotos) > 150:                     # fotos seguidas de un recorrido: cada una con sus vecinas
+        _colmap('sequential_matcher', '--database_path', db, '--SequentialMatching.overlap', 25,
+                '--FeatureMatching.use_gpu', 1)
+    else:
+        _colmap('exhaustive_matcher', '--database_path', db, '--FeatureMatching.use_gpu', 1)
     # Modelo «conocido»: las posiciones del móvil, con los números que COLMAP ha dado a cada imagen
     con = sqlite3.connect(db)
     ids = {nombre: (iid, cid) for iid, nombre, cid in con.execute('SELECT image_id, name, camera_id FROM images')}

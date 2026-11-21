@@ -362,7 +362,7 @@ def _fondo(msp, pl, conf, nom, est, o, u, mirando, t0, t1, h, P):
 def dibujar_alzado(msp, pl: Planta, conf, estancia, pared, base):
     """Alzado interior de la pared `pared` (dos esquinas) de `estancia`, visto desde dentro."""
     c, cap = conf['capas'], conf['capas_alzado']
-    a, b = (np.array(pl.p[n], float) for n in pared)
+    a, b = (np.array(pl.p[n] if isinstance(n, str) else n, float) for n in pared)
     est = pl.estancias[estancia]
     h = pl.viv.datos['estancias'][estancia]['altura']
     n = _hacia_fuera(est, a, b)
@@ -462,18 +462,24 @@ def _cajetin(lay, conf, valores):
                         att.dxf.text = valores[clave]
 
 
-def laminas(viv: Vivienda, salida, cajetin: dict, seccion: dict, alzado: dict, conf: dict | None = None):
-    """Dibuja planta, sección y alzado en la plantilla y la guarda en `salida` (DXF)."""
+def laminas(viv: Vivienda, salida, cajetin: dict, seccion: dict, alzado: dict, conf: dict | None = None,
+            crear_planta=None):
+    """Dibuja planta, sección y alzado en la plantilla y la guarda en `salida` (DXF). `crear_planta(desplazar)`
+    sustituye a la planta de una vivienda medida (p. ej. la de un escaneo de RoomPlan, `roomplan.importar`)."""
     conf = conf or leer_config()
     doc = ezdxf.readfile(conf['plantilla'])
     msp = doc.modelspace()
     L = conf['laminas']
     _, vp_planta = _ventana_principal(doc, L['cotas'])
     cx, cy = _centro(vp_planta)
-    pts = np.array(list(viv.p.values()))
+    if crear_planta:
+        pl0 = crear_planta((0.0, 0.0))
+        pts = np.array([c for e in pl0.estancias.values() for c in e.exterior.coords])
+    else:
+        pts = np.array(list(viv.p.values()))
     centro_viv = (pts.min(0) + pts.max(0)) / 2
-    pl = Planta(viv, (cx - centro_viv[0], cy - centro_viv[1]))
     d = (cx - centro_viv[0], cy - centro_viv[1])
+    pl = crear_planta(d) if crear_planta else Planta(viv, d)
     linea = [(x + d[0], y + d[1]) for x, y in seccion['linea']]
     dibujar_planta(msp, pl, conf, seccion={'linea': linea})
     for nom in ('distribucion', 'cotas'):
@@ -493,9 +499,12 @@ def laminas(viv: Vivienda, salida, cajetin: dict, seccion: dict, alzado: dict, c
     _cajetin(lay, conf, {**cajetin, 'subtitulo': seccion.get('titulo', "Sección A-A'")})
 
     # Alzado interior, más abajo
-    a, b = (pl.p[n] for n in alzado['pared'])
+    pared = alzado['pared']
+    if not isinstance(pared[0], str):                       # coordenadas (de una planta sin nombres de esquinas)
+        pared = [(q[0] + d[0], q[1] + d[1]) for q in pared]
+    a, b = (pl.p[n] if isinstance(n, str) else n for n in pared)
     base_a = (cx - math.dist(a, b) / 2, cy - 34)
-    dibujar_alzado(msp, pl, conf, alzado['estancia'], alzado['pared'], base_a)
+    dibujar_alzado(msp, pl, conf, alzado['estancia'], pared, base_a)
     lay, v = _ventana_principal(doc, L['alzado'])
     _encuadrar(v, (cx, base_a[1] + 3.0))
     _descongelar(v, capas_dibujo)
