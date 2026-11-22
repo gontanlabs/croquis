@@ -13,8 +13,11 @@ Una entrada por sesión, la más reciente arriba.
   Stray Scanner descartada).
 - **Limpieza:** unos 17,6 GB de pruebas descartadas de Croquis, a la Papelera (Jose: «tambien ves limpiando archivos
   pesados inutiles cuando puedas»).
-- **Siguiente paso:** leer `levantamientos/arkitscenes/resumen.json` (once casas); corregir el sesgo de 2 cm y el
-  caso de cristales y espejos; volver a medir.
+- **Ampliado a diez casas** antes de cerrar: sesgo del sensor confirmado en todas; paso 3 entre el 33 y el 78 % de
+  paredes a 2 cm o menos. Decisión C-013 (combinar RoomPlan y la nube LiDAR; método del banco aprobado).
+- **Cierre (2026-11-22):** código del banco guardado como `wip`; banco parado con diez de once casas.
+- **Siguiente paso:** mirar las paredes que fallan casa por casa; corregir el sesgo y el caso de cristales y espejos;
+  volver a medir.
 
 ## 2026-11-21 · Nace el proyecto
 

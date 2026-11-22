@@ -106,6 +106,13 @@ fuera del repo. Tres escaneos de casas distintas (42444946, 42444966, 42445021).
   estudios. Su papel es la forma y los detalles (huecos, pilares, techos), corregir RoomPlan y decidir qué pocas medidas
   de láser hacen falta. Los ±5 mm salen del láser.
 
+**Ampliado a diez casas** (`banco/todo.py`, resumen en `levantamientos/arkitscenes/resumen.json`; la undécima,
+42446517, quedó sin hacer al pausar):
+- El sesgo del sensor se confirma en las diez: de −12 a −22 mm hasta 2 m.
+- El paso 3, ya encajando el Faro sobre la nube del iPad y con la cara elegida por apoyo a lo largo de la pared, deja
+  entre el 33 y el 78 % de las paredes a 2 cm o menos según la casa (mediana por casa de 6 a 52 mm). El sesgo con signo
+  va de −55 a +25 mm según la casa, así que no es solo el del sensor. **Sigue sin cumplir.**
+
 **Siguiente, por este orden:** corregir el sesgo de 2 cm y volver a medir; que el paso 3 no se vaya a superficies vistas
 a través de cristales o espejos (exigir que la cara llegue al techo o al suelo y sea continua); arreglar el encaje de la
 primera casa; bajar más casas (el banco ya es automático) hasta tener decenas de paredes por caso del catálogo.

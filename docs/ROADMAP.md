@@ -1,6 +1,6 @@
 # Roadmap — Croquis
 
-Última actualización: 2026-11-21 (diseño completo en `docs/DISENO.md`, a revisar por Jose; C-011 y C-012).
+Última actualización: 2026-11-22 (cierre: banco de pruebas con diez casas; C-011 a C-013).
 
 ## Estado
 
@@ -19,6 +19,9 @@ EA.02 (cotas), EA.03 (alzado interior) y EA.04 (sección), impresas con AutoCAD 
 (nube LiDAR); la nube se encaja con la planta y ve techo a 2,48 m, la diagonal falsa y el hueco de arriba a la derecha.
 La corrección automática (`detectar.py`, cambios sin guardar en git) **no es fiable** todavía. Jose pidió parar los
 parches (C-011): diseño en `docs/DISENO.md`, banco de pruebas con ARKitScenes antes de seguir.
+**Noche del 2026-11-21:** banco de pruebas (`prototipo/banco/`) con diez casas de ARKitScenes y el láser Faro de
+referencia. El LiDAR del iPad mide de 12 a 22 mm corto hasta 2 m en las diez (sesgo corregible); el paso 3 (cara real de
+cada pared) deja entre el 33 y el 78 % de las paredes a 2 cm o menos: **no cumple** todavía.
 
 ## Lo que se sabe (investigación del 2026-11-21)
 
@@ -40,7 +43,7 @@ parches (C-011): diseño en `docs/DISENO.md`, banco de pruebas con ARKitScenes a
 
 1. ✅ Investigación de captura (`docs/INVESTIGACION-CAPTURA.md`): el móvil Android sin LiDAR no basta; el iPad Pro con
    RoomPlan sí (comedor: −5 mm de ancho; los 18 cm del largo eran un hueco que RoomPlan simplifica).
-2. ☐ **Fase 1, sin app propia:** escaneo con OpenPlan3D Capture (gratis, MIT) → Croquis importa su `plan.json` →
+2. ☐ **Fase 1, sin app propia:** escaneo con OpenPlan3D Capture (gratis; el editor web de openPlan3D es MIT, el código de la app iOS no lo he localizado) y nube LiDAR con SiteScape (solo datos de prueba, C-012) → Croquis importa su `plan.json` →
    medidas guiadas tecleadas (el GLM 40-31 no tiene Bluetooth) con preguntas de huecos y salientes por pared → planos
    EA.01–EA.04 en la plantilla. Primera prueba: el comedor de Jose.
 3. ☐ **Fase 2, app propia de iPad/iPhone** con Expo y expo-roomplan (sin Mac): escaneo y medidas en la misma app;
@@ -53,6 +56,9 @@ Lo hecho antes (prototipo en Python, `prototipo/`): ajuste de toda la casa, lám
 servidor y app web de pruebas en Android (descartada como captura).
 
 ## Por decidir
+
+- **Criterios de aceptación del diseño** (`docs/DISENO.md`): los números son propuesta de Claude; Jose aprobó el método
+  (C-013), no los números.
 
 - Cuadro de superficies de la plantilla: hoy queda con sus valores de ejemplo; Croquis debería rellenarlo.
 - Casa entera a ±5 mm: entre estancias separadas por un tabique sin puerta no se llega desde dentro (queda en ±1 cm);
@@ -68,9 +74,10 @@ servidor y app web de pruebas en Android (descartada como captura).
 
 ## Siguiente paso
 
-Banco de pruebas con ARKitScenes en marcha (Jose: «si tienes un metodo vamos con el»); primeros resultados en
-`docs/DISENO.md` › Resultados del banco: el LiDAR del iPad mide ~2 cm corto (corregible) y el paso 3 aún no cumple.
-Siguiente: corregir ese sesgo, el caso de cristales y espejos, y más casas.
+Seguir con el método del banco (Jose, C-013: «si tienes un metodo vamos con el»; al pausar: «pausamos y seguimos
+mañana»): leer `levantamientos/arkitscenes/resumen.json`, mirar las paredes que fallan casa por casa (dibujos de
+control), corregir el sesgo del sensor y las superficies vistas a través de cristales o espejos, y volver a medir hasta
+cumplir. Terminar la undécima casa (42446517) con `python banco/todo.py`.
 
 ## Pendiente de Jose
 
@@ -80,11 +87,10 @@ Siguiente: corregir ese sesgo, el caso de cristales y espejos, y más casas.
 
 ## Procesos abiertos
 
-- **Banco con once casas de ARKitScenes** (`prototipo/banco/todo.py`), lanzado el 2026-11-21 por la noche; deja cada
-  casa en `levantamientos/arkitscenes/resumen.json` según termina. Si se corta, se reanuda solo con
-  `python banco/todo.py` (salta las casas hechas).
-- **Código sin guardar en git** (a medias, sin terminar de probar): `prototipo/banco/` (el banco),
-  `detectar.py` (`caras_de_pared`: cara por apoyo a lo largo de la pared), `alinear.py` (`alinear_a_planta`) y
-  `roomplan.py` (opción `nube=`, **no fiable**: no usar todavía).
+- **Banco de ARKitScenes:** parado al cerrar la sesión con diez de once casas hechas (resumen en
+  `levantamientos/arkitscenes/resumen.json`). La que falta se hace con `python banco/todo.py` (salta las hechas).
+- **Código a medias, guardado como `wip`:** `prototipo/banco/`, `detectar.py` (`caras_de_pared`), `alinear.py`
+  (`alinear_a_planta`) y `roomplan.py` (opción `nube=`, **no fiable**: no usar todavía).
 - Datos del banco en `levantamientos/arkitscenes/` (unos 5,5 GB, fuera del repo): se pueden borrar y volver a bajar.
-- El servidor local de Croquis en la red, parado al pausar.
+- Servidor local de Croquis: parado. El móvil de pruebas quedó con adb por wifi (`adb tcpip`); se quita solo al
+  reiniciarlo.
