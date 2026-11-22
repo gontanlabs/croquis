@@ -82,3 +82,9 @@ aprobar va a «Por decidir» del roadmap.
 - Ante el diseño (`docs/DISENO.md`: catálogo de casos y comprobación contra láser en muchas habitaciones con
   ARKitScenes antes de dar nada por bueno), 21:27: «si tienes un metodo vamos con el».
 - Sin decidir todavía: los números de los criterios de aceptación del diseño (propuesta de Claude).
+
+**C-014 · 2026-11-21 · Lo más automático y sencillo posible para quien mide.**
+- Jose (2026-11-21, 20:14, mientras Claude trabajaba, ante tener que señalar a mano el hueco del salón que faltaba): «QUE NO
+  QUIERO MAS TRABAJO QUE LO QUE QUIERO ES QUE ESTO SE HAGA LO MAS AUTOMATICO Y SENCILLO POSIBLE TE ENTERAS O QUE».
+- Consecuencia: lo que la máquina pueda deducir no se le pide al usuario; cada paso manual que quede se justifica en
+  `docs/DISENO.md`. Apuntado el 2026-11-22 al abrir sesión (se había quedado fuera).
