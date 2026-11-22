@@ -74,8 +74,10 @@ def _girar(p, ang):
     return np.array([c * p[0] - s * p[1], s * p[0] + c * p[1]])
 
 
-def importar(r, desplazar=(0.0, 0.0), correcciones=None):
-    """`correcciones`: lo que detecta `detectar.paredes` (huecos y salientes por pared), para aplicarlo solo."""
+def importar(r, desplazar=(0.0, 0.0), correcciones=None, nube=None):
+    """`correcciones`: lo que detecta `detectar.paredes` (huecos y salientes por pared), para aplicarlo solo.
+    `nube`: puntos LiDAR en coordenadas de esta planta (x, y, altura sobre el suelo; ver alinear.alinear_a_planta).
+    Con ella, cada pared se lleva a la cara real que ve la nube y se añaden sus huecos y pilares (`_con_nube`)."""
     ang = _orientacion(r)
     suelo = min(_T(f)[1, 3] for f in r['floors']) if r.get('floors') else None
     paredes = {}
@@ -96,6 +98,9 @@ def importar(r, desplazar=(0.0, 0.0), correcciones=None):
         paredes[w['identifier']] = p
         if suelo is None:
             suelo = c[1] - alto / 2
+    informe_nube, extras = ([], [])
+    if nube is not None:
+        informe_nube, extras = _con_nube(r, ang, paredes, nube)
     lista = _unir(list(paredes.values()))
     _cerrar(lista)
     lista += _puentes(lista)
@@ -148,7 +153,63 @@ def importar(r, desplazar=(0.0, 0.0), correcciones=None):
     pl = _Planta(r, ang, suelo, lista, paredes, estancias, alturas, desplazar)
     if correcciones:
         pl.aplicar(r, ang, correcciones, desplazar)
+    pl.informe_nube = informe_nube
+    for ex in extras:
+        pl.sumar(ex, desplazar)
     return pl
+
+
+def _con_nube(r, ang, paredes, Q, error_max=0.008, mover_max=0.30):
+    """Lleva cada pared de RoomPlan a la cara que ve la nube LiDAR (desplazamiento y giro) y devuelve los huecos y
+    pilares encontrados como rectángulos en planta. Vale para cualquier casa: se hace pared a pared, en todas."""
+    import detectar
+    tipos = {i: p.tipo for p in importar(r).paredes for i in p.ids if i}
+    aberturas = {}
+    for lista in (r.get('doors', []), r.get('openings', []), r.get('windows', [])):
+        for d in lista:
+            p = paredes.get(d.get('parentIdentifier'))
+            if p is None:
+                continue
+            c = _girar(_T(d)[:3, 3][[0, 2]] * [1, -1], ang)
+            s = float((c - p.a) @ p.u); w = d['dimensions'][0]
+            aberturas.setdefault(d['parentIdentifier'], []).append((s - w / 2, s + w / 2))
+    techo = float(np.percentile(Q[:, 2], 99))
+    informe, extras = [], []
+    for ident, p in paredes.items():
+        caras = detectar.caras_de_pared(p.a, p.b, Q, aberturas.get(ident, ()), techo)
+        caras = {k: v for k, v in caras.items() if v['error_mm'] <= error_max * 1000 and v['ajuste'] >= 6}
+        if not caras:
+            continue
+        a, u, L = p.a.copy(), p.u, p.largo
+        n = np.array([-u[1], u[0]])
+        f0 = TABIQUE / 2 if tipos.get(ident) == 'tabique' else 0.0
+        da, db = [], []
+        for lado, c in caras.items():
+            da.append(lado * (c['c0'] - f0)); db.append(lado * (c['c0'] + c['c1'] * L - f0))
+            for tr in c['tramos']:
+                cara = lambda t: a + u * t + n * lado * (c['c0'] + c['c1'] * t)
+                q0, q1 = cara(tr['t0']), cara(tr['t1'])
+                hacia = -lado if tr['tipo'] == 'hueco' else lado        # hueco: hacia el muro; pilar: hacia dentro
+                f = tr['fondo']
+                rect = Polygon([tuple(q0 - n * hacia * 0.02), tuple(q1 - n * hacia * 0.02),
+                                tuple(q1 + n * hacia * f), tuple(q0 + n * hacia * f)])
+                extras.append({'tipo': tr['tipo'], 'poligono': rect, 'alturas': tr['alturas'], 'fondo': f,
+                               'ancho': round(tr['t1'] - tr['t0'], 2)})
+        da, db = float(np.mean(da)), float(np.mean(db))
+        if max(abs(da), abs(db)) > mover_max:
+            informe.append({'pared': ident[:6], 'aviso': f'la nube la pone a {max(abs(da), abs(db)):.2f} m: no se mueve'})
+            continue
+        p.a, p.b = a + n * da, p.b + n * db
+        d = p.b - p.a; t = math.degrees(math.atan2(d[1], d[0])) % 90
+        if min(t, 90 - t) < ESCUADRA:                                  # otra vez a escuadra
+            m = (p.a + p.b) / 2
+            if abs(d[0]) >= abs(d[1]):
+                p.a, p.b = np.array([p.a[0], m[1]]), np.array([p.b[0], m[1]])
+            else:
+                p.a, p.b = np.array([m[0], p.a[1]]), np.array([m[0], p.b[1]])
+        informe.append({'pared': ident[:6], 'movida_cm': [round(da * 100, 1), round(db * 100, 1)],
+                        'lados': len(caras), 'error_mm': max(c['error_mm'] for c in caras.values())})
+    return informe, extras
 
 
 def _lados_rect(pol):
@@ -350,6 +411,21 @@ class _Planta:
                     self.estancias[est[0]] = _mayor(est[1].difference(rect))
                     self.macizo = self.macizo.union(rect)
                 self.aplicadas.append({'estancia': est[0], **tr})
+
+    def sumar(self, ex, desplazar):
+        """Un hueco (se suma a la estancia de al lado, entrando en el muro) o un pilar (se resta y pasa a macizo)."""
+        from shapely.affinity import translate
+        rect = translate(ex['poligono'], *desplazar).buffer(0)
+        m = rect.centroid
+        nom = min(self.estancias, key=lambda k: self.estancias[k].distance(m))
+        if ex['tipo'] == 'hueco':
+            self.estancias[nom] = _mayor(self.estancias[nom].union(rect).buffer(0.002, join_style='mitre').buffer(-0.002, join_style='mitre'))
+            self.macizo = self.macizo.difference(rect)
+        else:
+            self.estancias[nom] = _mayor(self.estancias[nom].difference(rect))
+            self.macizo = self.macizo.union(rect)
+        self.exterior = Polygon(unary_union(list(self.estancias.values()) + [self.macizo]).buffer(0.01).exterior)
+        self.aplicadas = getattr(self, 'aplicadas', []) + [{'estancia': nom, **{k: v for k, v in ex.items() if k != 'poligono'}}]
 
     def resumen(self):
         return {n: (round(c.area, 2)) for n, c in self.estancias.items()}

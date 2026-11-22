@@ -77,21 +77,33 @@ def _orient(pts2):
     return mejor[1]
 
 
+def _dist_segs(Q, A, B):
+    """Distancia de cada punto Q (n×2) al segmento más cercano (A, B: m×2) y la normal de ese segmento."""
+    AB = B - A; L2 = (AB ** 2).sum(1)
+    t = np.clip(((Q[:, None, :] - A[None]) * AB[None]).sum(2) / L2[None], 0, 1)
+    proy = A[None] + t[..., None] * AB[None]
+    d = np.linalg.norm(Q[:, None, :] - proy, axis=2)
+    k = d.argmin(1)
+    u = AB[k] / np.sqrt(L2[k])[:, None]
+    return d[np.arange(len(Q)), k], np.c_[-u[:, 1], u[:, 0]], A[k]
+
+
 def alinear(r, P):
     suelo_r = min(_T(f)[1, 3] for f in r['floors'])
     suelo_p = float(np.percentile(P[:, 1], 1))
     h = P[:, 1] - suelo_p
     banda = P[(h > 1.3) & (h < 2.2)][:, [0, 2]]
-    if len(banda) > 60000:
-        banda = banda[np.random.default_rng(0).choice(len(banda), 60000, replace=False)]
+    rng = np.random.default_rng(0)
+    if len(banda) > 20000:
+        banda = banda[rng.choice(len(banda), 20000, replace=False)]
     segs = segmentos(r)
-    arbol = STRtree(segs)
-    # Orientaciones dominantes de las dos
-    pared_r = np.vstack([np.array(s.interpolate(t, normalized=True).coords[0]) for s in segs for t in np.linspace(0, 1, 20)])
+    A = np.array([s.coords[0] for s in segs]); B = np.array([s.coords[1] for s in segs])
+    pared_r = np.vstack([A + (B - A) * t for t in np.linspace(0, 1, 20)])
     giro0 = _orient(pared_r) - _orient(banda)
+    muestra = banda[rng.choice(len(banda), 1500, replace=False)]
 
-    def coste(pts):
-        d = np.array([arbol.geometries[arbol.nearest(Point(*q))].distance(Point(*q)) for q in pts[::20]])
+    def coste(q):
+        d, _, _ = _dist_segs(q, A, B)
         return float(np.median(np.minimum(d, 0.5)))
 
     mejor = None
@@ -99,40 +111,37 @@ def alinear(r, P):
     for k in range(4):
         g = giro0 + k * math.pi / 2
         R = np.array([[math.cos(g), -math.sin(g)], [math.sin(g), math.cos(g)]])
-        q = banda @ R.T
-        # Desplazamiento inicial: probar sobre una rejilla gruesa alrededor del centro de la casa
-        for dx in np.arange(-4, 4.01, 0.5):
-            for dz in np.arange(-4, 4.01, 0.5):
-                t = centro_r - q.mean(0) + [dx, dz]
+        q = muestra @ R.T
+        base = centro_r - q.mean(0)
+        for dx in np.arange(-5, 5.01, 0.25):
+            for dz in np.arange(-5, 5.01, 0.25):
+                t = base + [dx, dz]
                 c = coste(q + t)
                 if mejor is None or c < mejor[0]:
                     mejor = (c, g, t)
     c, g, t = mejor
-    # ICP en planta (punto a recta)
-    for _ in range(30):
+    for _ in range(40):                                   # ICP punto a recta, en planta
         R = np.array([[math.cos(g), -math.sin(g)], [math.sin(g), math.cos(g)]])
         q = banda @ R.T + t
-        A, b = [], []
-        for p in q[::5]:
-            s = arbol.geometries[arbol.nearest(Point(*p))]
-            if s.distance(Point(*p)) > 0.3:
-                continue
-            (x1, y1), (x2, y2) = s.coords
-            u = np.array([x2 - x1, y2 - y1]); u /= np.linalg.norm(u); n = np.array([-u[1], u[0]])
-            res = (p - [x1, y1]) @ n
-            jac = [n @ np.array([-p[1] + t[1], p[0] - t[0]]), n[0], n[1]]   # d(res)/d(giro, tx, tz)
-            A.append(jac); b.append(-res)
-        if len(A) < 50:
+        d, n, a = _dist_segs(q, A, B)
+        ok = d < 0.25
+        if ok.sum() < 100:
             break
-        dg, dtx, dtz = np.linalg.lstsq(np.array(A), np.array(b), rcond=None)[0]
+        qq, nn, aa = q[ok], n[ok], a[ok]
+        res = ((qq - aa) * nn).sum(1)
+        rel = qq - t
+        jac = np.c_[nn[:, 0] * -rel[:, 1] + nn[:, 1] * rel[:, 0], nn[:, 0], nn[:, 1]]
+        dg, dtx, dtz = np.linalg.lstsq(jac, -res, rcond=None)[0]
         g += dg; t = t + [dtx, dtz]
-        if abs(dg) < 1e-5 and abs(dtx) + abs(dtz) < 1e-4:
+        if abs(dg) < 1e-6 and abs(dtx) + abs(dtz) < 1e-5:
             break
     R = np.array([[math.cos(g), -math.sin(g)], [math.sin(g), math.cos(g)]])
     xz = P[:, [0, 2]] @ R.T + t
     alineada = np.c_[xz[:, 0], P[:, 1] - suelo_p + suelo_r, xz[:, 1]]
-    return alineada, {'giro_grados': round(math.degrees(g), 2), 'desplazamiento': [round(float(v), 3) for v in t],
-                      'error_mediano_m': round(coste(xz[(h > 1.3) & (h < 2.2)][:20000]), 3)}
+    final = banda @ R.T + t
+    d, _, _ = _dist_segs(final, A, B)
+    return alineada, {'giro_grados': round(math.degrees(g) % 360, 2), 'desplazamiento': [round(float(v), 3) for v in t],
+                      'error_mediano_m': round(float(np.median(d)), 3), 'dentro_de_3cm': round(float((d < 0.03).mean()), 2)}
 
 
 if __name__ == '__main__':
@@ -148,3 +157,64 @@ if __name__ == '__main__':
         if p.get('tramos') and p['puntos'] > 500:
             print(p)
     print(detectar.techos(r, Q))
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# Encaje con una estancia de la planta limpia (roomplan.importar): más fiable que buscar a ciegas en toda la casa
+# ---------------------------------------------------------------------------------------------------------------
+def rect_orientado(q2):
+    """Rectángulo principal de unos puntos de pared en planta: ángulo, centro y medidas (percentiles 2–98)."""
+    th = _orient(q2)
+    R = np.array([[math.cos(-th), -math.sin(-th)], [math.sin(-th), math.cos(-th)]])
+    q = q2 @ R.T
+    lo, hi = np.percentile(q, 2, axis=0), np.percentile(q, 98, axis=0)
+    c = R.T @ ((lo + hi) / 2)
+    return th, c, hi - lo
+
+
+def alinear_a_planta(pl, P):
+    """P: nube (Y arriba). Devuelve la nube en coordenadas de la planta (x, y, altura sobre el suelo), la estancia
+    con la que encaja y la calidad del encaje."""
+    suelo_p = float(np.percentile(P[:, 1], 1))
+    h = P[:, 1] - suelo_p
+    q_todo = np.c_[P[:, 0], -P[:, 2]]                   # planta: x, -z (como roomplan)
+    banda = q_todo[(h > 1.3) & (h < 2.2)]
+    rng = np.random.default_rng(0)
+    if len(banda) > 20000:
+        banda = banda[rng.choice(len(banda), 20000, replace=False)]
+    th, c, (w, l) = rect_orientado(banda)
+    A = np.array([p.a for p in pl.paredes]); B = np.array([p.b for p in pl.paredes])
+    mejor = None
+    for nom, est in pl.estancias.items():
+        x0, y0, x1, y1 = est.bounds
+        for k in range(4):
+            g = -th + k * math.pi / 2                       # la planta está a escuadra con los ejes
+            dims = (w, l) if k % 2 == 0 else (l, w)
+            err = abs(dims[0] - (x1 - x0)) + abs(dims[1] - (y1 - y0))
+            if err > 1.2:
+                continue
+            R = np.array([[math.cos(g), -math.sin(g)], [math.sin(g), math.cos(g)]])
+            t = np.array([(x0 + x1) / 2, (y0 + y1) / 2]) - R @ c
+            for _ in range(40):                             # ICP punto a recta
+                q = banda @ R.T + t
+                d, n, a = _dist_segs(q, A, B)
+                ok = d < 0.25
+                if ok.sum() < 100:
+                    break
+                qq, nn, aa = q[ok], n[ok], a[ok]
+                res = ((qq - aa) * nn).sum(1); rel = qq - t
+                jac = np.c_[nn[:, 0] * -rel[:, 1] + nn[:, 1] * rel[:, 0], nn[:, 0], nn[:, 1]]
+                dg, dtx, dty = np.linalg.lstsq(jac, -res, rcond=None)[0]
+                g += dg; t = t + [dtx, dty]
+                R = np.array([[math.cos(g), -math.sin(g)], [math.sin(g), math.cos(g)]])
+                if abs(dg) < 1e-6 and abs(dtx) + abs(dty) < 1e-5:
+                    break
+            d, _, _ = _dist_segs(banda @ R.T + t, A, B)
+            nota = float((d < 0.03).mean())
+            if mejor is None or nota > mejor[0]:
+                mejor = (nota, nom, g, t, float(np.median(d)))
+    nota, nom, g, t, med = mejor
+    R = np.array([[math.cos(g), -math.sin(g)], [math.sin(g), math.cos(g)]])
+    xy = q_todo @ R.T + t
+    return np.c_[xy, h], {'estancia': nom, 'dentro_de_3cm': round(nota, 2), 'error_mediano_m': round(med, 3),
+                          'medidas_escaneo': [round(float(w), 2), round(float(l), 2)]}
