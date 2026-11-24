@@ -81,3 +81,32 @@ Conclusión: la captura que funciona es un vídeo normal y nítido andando; la g
 láser. Un ~5 % es nivel de croquis (CubiCasa anuncia 95–97 %); las cotas exactas las da después el láser.
 Pendiente: usar todo el vídeo por tandas (8 GB de memoria gráfica: ~25 fotogramas cada vez), detectar las paredes
 sin confundirlas con muebles o con lo que se ve por una puerta, y una app de captura guiada que grabe vídeo normal.
+
+## Viabilidad para el perímetro y láser con Bluetooth (2026-11-24)
+
+Encargo de Jose: saber antes del viernes 27 (Black Friday) si Croquis es viable y qué hay que comprar; «si el perimetro
+de una vivienda se nos va 10 cm la hemos cagado».
+
+**Perímetro de una estancia, con el banco de ARKitScenes** (43 paredes de 10 casas contra el láser Faro; 20.000
+estancias rectangulares simuladas con los errores reales de cada casa; script en la bitácora de la sesión):
+
+| Método | Error típico | 95 % menos de | Estancias bajo 10 cm |
+|---|---|---|---|
+| Solo LiDAR del iPad | 164 mm | 693 mm | 24 % |
+| LiDAR + 1 medida de láser por estancia | 63 mm | 409 mm | 62 % |
+| LiDAR + 2 medidas de láser (largo y ancho) | 3 mm | 8 mm | 100 % |
+
+Conclusión: viable si las cotas las da el láser; el iPad da la forma y dice qué medidas hacen falta. Falta la prueba en
+la casa de Jose (salón y comedor, cada pared con su láser).
+
+**Láser con Bluetooth** (investigación del 24-11, con fuentes):
+- Ninguno por debajo de 150 € tiene modo teclado (escribir la medida en cualquier campo). El más barato que lo tiene es
+  el Leica DISTO X3 (más de 300 €).
+- Safari en iPadOS no tiene Web Bluetooth; el navegador gratuito **Bluefy** sí (exige HTTPS). Con él, una web app puede
+  leer un láser BLE de protocolo conocido sin app nativa ni cuota de Apple (sin probar todavía en el iPad).
+- Protocolo conocido por ingeniería inversa: **Leica DISTO D1** (~114 €, ±2 mm) y **Bosch AdvancedDistance 50C**
+  (~109 €, ±2 mm, sin disparo remoto); Bosch GLM 50-27 C (±1,5 mm) cuesta 160–271 €. Stabila LD 250 BT, sin protocolo
+  publicado.
+- Una app nativa en el iPad (Expo + EAS, sin Mac) exige la cuenta de desarrollador de Apple (99 USD al año).
+- Recomendación: comprar solo si el D1 o el AdvancedDistance 50C bajan de unos 100 € el viernes, en una tienda con
+  devolución, y probarlo con Bluefy en los 14 días; si no, el GLM 40-31 sigue valiendo, tecleando las medidas.
