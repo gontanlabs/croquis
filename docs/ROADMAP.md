@@ -81,9 +81,7 @@ cumplir. Terminar la undécima casa (42446517) con `python banco/todo.py`.
 
 ## Pendiente de Jose
 
-1. Decir si se mandan a la Papelera unos 15 GB de esta sesión fuera de GontanLabs: VGGT (modelo en la caché de
-   Hugging Face, 9,6 GB, y `~/herramientas/vggt-env`, 4,6 GB), el instalador de COLMAP (`~/herramientas/colmap-descarga`)
-   y el zip duplicado del escaneo en Descargas.
+1. ✅ Hecho el 24-11: VGGT (modelo y entorno) y el instalador de COLMAP, a la Papelera. El zip del escaneo en Descargas se queda (sin duplicado confirmado).
 
 ## Procesos abiertos
 
