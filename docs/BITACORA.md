@@ -2,6 +2,13 @@
 
 Una entrada por sesión, la más reciente arriba.
 
+## 2026-11-23 / 2026-11-24 · C-014 y viabilidad para el Black Friday
+
+- **Decisión:** C-014 («lo más automático y sencillo posible», frase del 21-11 que faltaba).
+- **Viabilidad** (`docs/INVESTIGACION-CAPTURA.md`): con el banco (43 paredes de 10 casas), el perímetro de una estancia queda bajo 10 cm en el 24 % de los casos con solo LiDAR, el 62 % con una medida de láser y el 100 % con dos (p95 8 mm). Viable si las cotas las da el láser.
+- **Equipo:** el iPad es de Jose; para el estudio, el más barato con LiDAR es un iPhone 13 Pro reacondicionado (~290–390 €). Láser con Bluetooth: Leica D1 o Bosch AdvancedDistance 50C (~110 €), legibles desde una web con el navegador Bluefy; comprar solo si bajan de ~100 €. Quest 3 del estudio: posible pero menos precisa; sin probar.
+- **Pendiente de Jose:** la prueba en su casa (salón y comedor, cada pared con láser) y sus tiempos de levantamiento para saber si compensa.
+
 ## 2026-11-21 (tarde y noche) · Del escaneo del iPad al banco de pruebas
 
 - **Hecho:** escaneo de la casa de Jose con el iPad (OpenPlan3D Capture) y del salón con SiteScape; la nube LiDAR se
