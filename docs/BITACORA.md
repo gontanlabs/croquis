@@ -2,6 +2,12 @@
 
 Una entrada por sesión, la más reciente arriba.
 
+## 2026-11-25 · Kit de la prueba en casa y tiempos reales del estudio
+
+- **Hecho:** `prototipo/prueba_casa.py`: plano del escaneo del 21-11 con 38 paredes numeradas en 7 estancias y hoja de medidas (`prototipo/salida/prueba-casa/hoja.html`); `veredicto` compara el perímetro de cada estancia con el láser, solo iPad y iPad + 2 medidas. Probado con medidas inventadas (fichero renombrado como `medidas-PRUEBA-inventada.txt`). Tiempos del estudio en `docs/INVESTIGACION-CAPTURA.md`: 8 h en obra (dos personas, 4 h) + 30 h de dibujo, 1,5 levantamientos al mes; cuenta provisional, ~45 h ahorradas al mes si la prueba confirma la precisión.
+- **Ecosistema:** Croquis será el piloto del nuevo método de trabajo desde el 28-11 (L-030).
+- **Siguiente:** Jose mide mañana (26-11) con luz («mañana mido, hoy ya es de noche»); veredicto antes del viernes 27.
+
 ## 2026-11-23 / 2026-11-24 · C-014 y viabilidad para el Black Friday
 
 - **Decisión:** C-014 («lo más automático y sencillo posible», frase del 21-11 que faltaba).
