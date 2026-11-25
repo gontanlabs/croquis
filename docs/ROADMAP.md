@@ -74,7 +74,7 @@ servidor y app web de pruebas en Android (descartada como captura).
 
 ## Siguiente paso
 
-**Antes del viernes 27 (Black Friday):** veredicto de viabilidad y lista de compra. Hecho el 24-11 con el banco: viable si las cotas las da el láser (2 por estancia, p95 8 mm; ver `docs/INVESTIGACION-CAPTURA.md`). Falta la prueba en casa de Jose (salón y comedor, cada pared con láser) **[Jose]** y sus tiempos de levantamiento para la cuenta de si compensa **[Jose]**. Después, seguir con el método del banco (abajo).
+**Antes del viernes 27 (Black Friday):** veredicto de viabilidad y lista de compra. **Kit de la prueba listo (25-11):** `prototipo/prueba_casa.py hoja` genera `prototipo/salida/prueba-casa/hoja.html` con el plano del escaneo del 21-11 (38 paredes numeradas en 7 estancias; no hace falta escanear otra vez); Jose mide cada pared y las dos luces de cada estancia con el láser, apunta «12: 3,412» y `prueba_casa.py veredicto` da, por estancia, el error del perímetro solo con el iPad y con las 2 medidas de láser. Hecho el 24-11 con el banco: viable si las cotas las da el láser (2 por estancia, p95 8 mm; ver `docs/INVESTIGACION-CAPTURA.md`). Falta la prueba en casa de Jose (salón y comedor, cada pared con láser) **[Jose]** y sus tiempos de levantamiento para la cuenta de si compensa **[Jose]**. Después, seguir con el método del banco (abajo).
 
 Seguir con el método del banco (Jose, C-013: «si tienes un metodo vamos con el»; al pausar: «pausamos y seguimos
 mañana»): leer `levantamientos/arkitscenes/resumen.json`, mirar las paredes que fallan casa por casa (dibujos de
