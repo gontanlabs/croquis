@@ -110,3 +110,15 @@ la casa de Jose (salón y comedor, cada pared con su láser).
 - Una app nativa en el iPad (Expo + EAS, sin Mac) exige la cuenta de desarrollador de Apple (99 USD al año).
 - Recomendación: comprar solo si el D1 o el AdvancedDistance 50C bajan de unos 100 € el viernes, en una tienda con
   devolución, y probarlo con Bluefy en los 14 días; si no, el GLM 40-31 sigue valiendo, tecleando las medidas.
+
+## Lo que cuesta hoy un levantamiento en VLANC (datos del estudio, 2026-11-25)
+
+Respuesta del estudio a Jose: «1) 8 horas de trabajo (dos personas 4 horas) de media; 2) 30h de media; 3) 1,5
+levantamientos de media al mes». Es decir, unas **38 horas por levantamiento** (8 en la obra y 30 dibujando) y unas
+**57 horas al mes**.
+
+Cuenta provisional (Claude; los tiempos con Croquis son estimaciones por comprobar en la prueba): si la obra baja a una
+persona 1–1,5 h (escaneo y 2 medidas de láser por estancia) y el dibujo a 3–5 h de revisión, el ahorro sería de unas 30
+horas por levantamiento, unas 45 horas al mes. El equipo (iPhone con LiDAR reacondicionado, unos 290–390 €, más un láser
+con Bluetooth de unos 100 €) se pagaría con el primer levantamiento. Sin contar las horas de desarrollo, y solo si la
+prueba en casa confirma la precisión.
