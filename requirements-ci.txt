@@ -1,0 +1,4 @@
+# Solo lo que necesitan las comprobaciones (CI y local), no todo el prototipo (torch, shapely, ezdxf…).
+numpy==2.5.4
+pytest==9.2.0
+ruff==0.17.6

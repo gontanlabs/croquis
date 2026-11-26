@@ -8,7 +8,7 @@ El ajuste de Croquis en Python, antes de llevarlo a Android.
   cotas con «≈» si no cumplen ±5 mm, nombre y superficie útil, cajetín de la lámina de cotas).
 - `prueba_a.py`: estancia inventada en L, medidas simuladas de un láser de mano, bucle de «mide esto», error de tecleo
   y lámina. Escribe `salida/informe.txt` y `salida/prueba_a.dxf`.
-- `test_ajuste.py`: `python test_ajuste.py`.
+- Pruebas del ajuste: `../tests/test_ajuste.py` (`python scripts/comprobar.py` desde la raíz del repo).
 - `vivienda.py`: la casa entera. Estancias unidas por las jambas de sus puertas (jamba a escuadra, ±3 mm) y caras de
   tabique paralelas (±3 mm, detectadas solas); qué medir después, también de una estancia a otra por una puerta.
 - `planos.py`: láminas de distribución, cotas, alzado interior y sección dentro de la plantilla del estudio.

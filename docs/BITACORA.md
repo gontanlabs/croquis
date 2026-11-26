@@ -2,6 +2,13 @@
 
 Una entrada por sesión, la más reciente arriba.
 
+## 2026-11-26 (noche) · Piloto del método: comprobaciones, CI y equipo
+
+- **Inicio:** `81a269a`. Montaje hecho desde una sesión de la raíz del laboratorio (no cuenta para las medidas del piloto; las tareas de Croquis, desde aquí, en sesiones abiertas en esta carpeta).
+- **Hecho:** orden aparte (7 imports y 2 variables sin usar, `8ebfb4a`); `scripts/comprobar.py` de la plantilla con lo propio de Croquis (tests, ruff con reglas de errores reales, compilación, documentos y ningún dato de levantamientos en git); el pre-commit lo lanza (1,3 s) y la CI de GitHub, más gitleaks. El test pasa a `tests/` con pytest. Comprobado que bloquea: un fichero de `levantamientos/` añadido a la fuerza y un test roto, los dos rechazados.
+- **Equipo:** subagentes de usuario `revisor` (solo lectura) y `verificador` (Haiku; un hook le impide tocar tests existentes, banco de 13 casos en verde).
+- **Siguiente:** la prueba en casa de Jose y su veredicto, ya con el método (una tarea, una sesión, revisor al terminar).
+
 ## 2026-11-25 · Kit de la prueba en casa y tiempos reales del estudio
 
 - **Hecho:** `prototipo/prueba_casa.py`: plano del escaneo del 21-11 con 38 paredes numeradas en 7 estancias y hoja de medidas (`prototipo/salida/prueba-casa/hoja.html`); `veredicto` compara el perímetro de cada estancia con el láser, solo iPad y iPad + 2 medidas. Probado con medidas inventadas (fichero renombrado como `medidas-PRUEBA-inventada.txt`). Tiempos del estudio en `docs/INVESTIGACION-CAPTURA.md`: 8 h en obra (dos personas, 4 h) + 30 h de dibujo, 1,5 levantamientos al mes; cuenta provisional, ~45 h ahorradas al mes si la prueba confirma la precisión.

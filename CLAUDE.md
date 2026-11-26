@@ -29,6 +29,16 @@ desarrolla aquí «al menos en inicio» y se traspasa a VLANC cuando toque. Sus 
   grosores de muro y habitaciones que encajan entre sí por las puertas.
 - **La app dice qué medir después** y el plano marca qué cotas cumplen ya los ±5 mm y cuáles son estimadas.
 
+## Cómo se trabaja aquí (piloto del método, L-030 y L-031)
+
+- **Una tarea, una sesión**, abierta en esta carpeta. Al empezar, el commit de inicio va a la bitácora; al terminar,
+  el subagente `revisor` revisa `git diff <inicio>..HEAD` en contexto limpio y se arregla solo lo aceptado.
+- **Paso a paso:** un paso, `python scripts/comprobar.py`, commit. El pre-commit lanza `--rapido` (1–2 s: tests, ruff,
+  compilación, documentos y que no haya datos de clientes en git) y la CI de GitHub, todo más gitleaks. En rojo no se
+  guarda ni se da nada por terminado.
+- **Tarea grande:** antes de programar, `docs/specs/<tarea>.md` aprobado por Jose.
+- Comprobaciones propias: `PROPIAS` en `scripts/comprobar.py`; dependencias de la CI en `requirements-ci.txt`.
+
 ## Documentos
 
 `docs/ROADMAP.md` (estado, plan, por decidir, pendiente de Jose), `docs/DECISIONES.md` (con la frase de Jose),

@@ -1,0 +1,13 @@
+# Configuración de las comprobaciones (scripts/comprobar.py). Croquis no se instala como paquete.
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["prototipo"]
+
+[tool.ruff]
+target-version = "py312"
+
+[tool.ruff.lint]
+# Solo errores reales (sintaxis, nombres sin definir, imports y variables sin usar), no estilo:
+# el prototipo usa «;» y lambdas a propósito. Se amplía cuando el código pase a la app.
+select = ["E9", "F"]
