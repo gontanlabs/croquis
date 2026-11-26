@@ -43,7 +43,7 @@ def paredes(r, P, camaras=None, suelo=None):
             if len(cerca):
                 signo = 1.0 if np.median((cerca - c) @ n) > 0 else -1.0
         detras = -signo * d[sel]                       # > 0: por detrás del plano (dentro del muro o un hueco)
-        ts, hs = t[sel], h[sel]
+        ts = t[sel]
         cara = float(np.median(detras))                # dónde está de verdad la pared (en conjunto)
         tramos = []
         bins = np.arange(-L / 2, L / 2 + PASO, PASO)
@@ -178,7 +178,7 @@ def estancia(pol, Q, paso=0.05, umbral=0.04, min_tramo=0.20):
 def contorno_real(pol_dibujo, Q, celda=0.02):
     """La forma real de una estancia con la nube LiDAR: los puntos de la franja pegada al techo (donde no llegan los
     muebles) dibujan sus paredes; se rellena desde dentro y se simplifica a tramos rectos a escuadra."""
-    from shapely.geometry import Polygon as Pol, box
+    from shapely.geometry import box
     from shapely.ops import unary_union
     techo = float(np.percentile(Q[:, 2], 99))
     franja = Q[(Q[:, 2] > techo - 0.30) & (Q[:, 2] < techo - 0.05)][:, :2]

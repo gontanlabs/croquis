@@ -1,5 +1,4 @@
 """Pruebas del ajuste (python test_ajuste.py)."""
-import math
 
 from ajuste import Planta
 from prueba_a import ejecutar

@@ -16,7 +16,7 @@ from pathlib import Path
 
 import numpy as np
 
-from ajuste import MARGENES, TOLERANCIA, Planta
+from ajuste import MARGENES, Planta
 
 AQUI = Path(__file__).parent
 

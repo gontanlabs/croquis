@@ -4,7 +4,6 @@ Se ejecuta con el entorno aparte: ~/herramientas/vggt-env/Scripts/python vggt_pr
 Deja en <casa>/vggt-<ID>/: puntos.npy (x, y planta; h altura, metros), planta.png y el resultado de las paredes.
 VGGT-1B es de uso no comercial (C-009): para VLANC, VGGT-1B-Commercial.
 """
-import json
 import sys
 from pathlib import Path
 

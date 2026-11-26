@@ -14,8 +14,7 @@ import sys
 from pathlib import Path
 
 import numpy as np
-from shapely.geometry import LineString, Point
-from shapely.strtree import STRtree
+from shapely.geometry import LineString
 
 
 def leer_nube(ruta: Path):

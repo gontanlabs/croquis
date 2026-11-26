@@ -71,7 +71,6 @@ def hoja():
         d.line([pt(a), pt(b)], fill='#151515', width=4)
     for nombre, (paredes, (x0, y0, x1, y1)) in est.items():
         d.text(pt(((x0 + x1) / 2, (y0 + y1) / 2)), nombre, fill='#666', font=fg, anchor='mm')
-    centro = {nombre: ((x0 + x1) / 2, (y0 + y1) / 2) for nombre, (_, (x0, y0, x1, y1)) in est.items()}
     for n, nombre, a, b, l in lista:
         mx, my = (a[0] + b[0]) / 2, (a[1] + b[1]) / 2
         nx, ny = -(b[1] - a[1]) / l, (b[0] - a[0]) / l          # normal de la pared, hacia dentro de su estancia

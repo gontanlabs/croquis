@@ -114,7 +114,6 @@ def responder(datos: Path, pedido):
 
 
 def planos(datos: Path, ident: str):
-    import sys
     from estudio import leer_config
     from imprimir import imprimir
     from planos import laminas
