@@ -7,7 +7,9 @@ Una entrada por sesión, la más reciente arriba.
 - **Inicio:** `81a269a`. Montaje hecho desde una sesión de la raíz del laboratorio (no cuenta para las medidas del piloto; las tareas de Croquis, desde aquí, en sesiones abiertas en esta carpeta).
 - **Hecho:** orden aparte (7 imports y 2 variables sin usar, `8ebfb4a`); `scripts/comprobar.py` de la plantilla con lo propio de Croquis (tests, ruff con reglas de errores reales, compilación, documentos y ningún dato de levantamientos en git); el pre-commit lo lanza (1,3 s) y la CI de GitHub, más gitleaks. El test pasa a `tests/` con pytest. Comprobado que bloquea: un fichero de `levantamientos/` añadido a la fuerza y un test roto, los dos rechazados.
 - **Equipo:** subagentes de usuario `revisor` (solo lectura) y `verificador` (Haiku; un hook le impide tocar tests existentes, banco de 13 casos en verde).
-- **Siguiente:** la prueba en casa de Jose y su veredicto, ya con el método (una tarea, una sesión, revisor al terminar).
+- **Revisión:** el `revisor` encontró 4 fallos graves reales (rutas con tildes que se colaban en git, `~/.croquis` que no se vigilaba, huecos del hook, rojos falsos al compilar) y 4 menores; arreglados (`15b54a0`, `fe5eb30`) y confirmados en una segunda revisión. CI en verde en los tres commits.
+- **Jose:** no llega a medir antes del viernes 27 («es de noche ya y no va a dar tiempo para mañana»).
+- **Siguiente:** la prueba en casa de Jose y su veredicto, ya con el método: sesión abierta en esta carpeta, una tarea por sesión, `revisor` al terminar.
 
 ## 2026-11-25 · Kit de la prueba en casa y tiempos reales del estudio
 
