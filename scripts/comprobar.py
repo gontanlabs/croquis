@@ -60,6 +60,24 @@ def ejecutar(orden):
     return r.returncode, "\n".join(salida[-25:])
 
 
+def py_guardados():
+    salida = subprocess.run(["git", "-C", str(RAIZ), "ls-files", "-z", "*.py"], capture_output=True).stdout
+    return [RAIZ / p.decode("utf-8", "surrogateescape") for p in salida.split(b"\0") if p]
+
+
+def compilar():
+    """Compila en memoria (sin escribir __pycache__) cada .py guardado que siga en el disco."""
+    fallos = 0
+    for f in py_guardados():
+        if f.is_file():
+            try:
+                compile(f.read_bytes(), str(f), "exec")
+            except (SyntaxError, ValueError) as e:
+                fallos += 1
+                print(f"{f.relative_to(RAIZ).as_posix()}: {e}")
+    return 1 if fallos else 0
+
+
 def detectadas(rapido):
     """Las comprobaciones que el propio repo declara, sin inventar ninguna."""
     lista = []
@@ -72,11 +90,10 @@ def detectadas(rapido):
     tests_py = list((RAIZ / "tests").glob("test_*.py")) if (RAIZ / "tests").is_dir() else []
     if tests_py and (not rapido or TESTS_RAPIDOS):
         lista.append(("pytest", [sys.executable, "-m", "pytest", "-q"]))
-    # Solo los .py guardados en git: compileall recorría también lo ignorado (8 GB de datos en un repo: 9 s).
-    py = subprocess.run(["git", "-C", str(RAIZ), "ls-files", "*.py"], capture_output=True, text=True,
-                        encoding="utf-8", errors="replace").stdout.split()
-    if py:
-        lista.append(("python compila", [sys.executable, "-m", "py_compile", *py]))
+    # Solo los .py guardados en git (compileall recorría también lo ignorado: 9 s con 8 GB de datos), compilados
+    # dentro de este mismo script: ni comillas de git con tildes ni límite de la línea de órdenes de Windows.
+    if py_guardados():
+        lista.append(("python compila", [sys.executable, str(Path(__file__).resolve()), "--compilar"]))
     if (RAIZ / "gradlew").is_file() and not rapido:
         gradle = RAIZ / ("gradlew.bat" if sys.platform == "win32" else "gradlew")
         lista.append(("gradle test", [str(gradle), "test"]))
@@ -90,7 +107,10 @@ def main():
             flujo.reconfigure(encoding="utf-8")
     ap = argparse.ArgumentParser()
     ap.add_argument("--rapido", action="store_true", help="solo lo rápido (antes de cada commit)")
+    ap.add_argument("--compilar", action="store_true", help=argparse.SUPPRESS)
     a = ap.parse_args()
+    if a.compilar:
+        return compilar()
 
     rojo = False
     fallos = documentos()

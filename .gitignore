@@ -16,3 +16,7 @@ levantamientos/
 # Prototipo: lo que genera (DXF, PDF, informes) y cachés
 prototipo/salida/
 __pycache__/
+
+# Configuración y plantilla reales del estudio: viven en ~/.croquis (el ejemplo sí va: estudio.ejemplo.json)
+estudio.json
+plantilla*.dxf
