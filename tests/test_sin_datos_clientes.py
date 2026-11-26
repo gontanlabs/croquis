@@ -37,3 +37,15 @@ def test_copia_de_las_claves_con_otro_nombre(tmp_path):
     (r / "prototipo" / "config.json").write_text('{"estudio": "real"}', encoding="utf-8")
     subprocess.run(["git", "-C", str(r), "add", "."], check=True)
     assert revisar(r, claves) == ["copia de ~/.croquis/estudio.json en git: prototipo/config.json"]
+
+
+def test_ejemplo_sin_editar_y_ficheros_vacios_no_cuentan(tmp_path):
+    r = repo(tmp_path / "repo")
+    claves = tmp_path / "claves"
+    claves.mkdir()
+    (claves / "estudio.json").write_text('{"estudio": "ejemplo"}', encoding="utf-8")
+    (claves / "marcador").write_bytes(b"")
+    (r / "prototipo" / "estudio.ejemplo.json").write_text('{"estudio": "ejemplo"}', encoding="utf-8")
+    (r / "prototipo" / "__init__.py").write_bytes(b"")
+    subprocess.run(["git", "-C", str(r), "add", "."], check=True)
+    assert revisar(r, claves) == []

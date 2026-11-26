@@ -30,7 +30,9 @@ def revisar(raiz=RAIZ, claves=CLAVES):
     problemas = [f"datos de clientes en git: {p}" for p in sorted(set(guardadas) | set(preparadas))
                  if p.startswith("levantamientos/") or "/levantamientos/" in p]
 
-    ficheros = [f for f in claves.rglob("*") if f.is_file()] if claves.is_dir() else []
+    # Los vacíos no cuentan (su contenido coincide con cualquier __init__.py), y un ejemplo sin editar tampoco: el
+    # README manda copiar estudio.ejemplo.json a ~/.croquis/estudio.json.
+    ficheros = [f for f in claves.rglob("*") if f.is_file() and f.stat().st_size] if claves.is_dir() else []
     if ficheros:
         # Contenido de cada fichero del índice (lo guardado más lo preparado): modo, blob, etapa y ruta.
         indice = {}
@@ -39,7 +41,7 @@ def revisar(raiz=RAIZ, claves=CLAVES):
             indice.setdefault(datos.split()[1], []).append(ruta)
         hashes = git(raiz, "hash-object", "--stdin-paths", entrada="\n".join(map(str, ficheros)).encode()).split()
         for f, h in zip(ficheros, hashes):
-            for ruta in indice.get(h.decode(), []):
+            for ruta in (r for r in indice.get(h.decode(), []) if ".ejemplo." not in r):
                 problemas.append(f"copia de ~/.croquis/{f.relative_to(claves).as_posix()} en git: {ruta}")
     return problemas
 
