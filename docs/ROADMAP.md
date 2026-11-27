@@ -42,7 +42,8 @@ cada pared) deja entre el 33 y el 78 % de las paredes a 2 cm o menos: **no cumpl
 ## Plan (C-010: producto con app para iPhone/iPad Pro y panel web)
 
 1. ✅ Investigación de captura (`docs/INVESTIGACION-CAPTURA.md`): el móvil Android sin LiDAR no basta; el iPad Pro con
-   RoomPlan sí (comedor: −5 mm de ancho; los 18 cm del largo eran un hueco que RoomPlan simplifica).
+   RoomPlan sí (comedor: −5 mm de ancho; los 18 cm del largo eran un hueco que RoomPlan simplifica). Los aparatos que
+   miden desde el medio de la habitación (escáneres, P2P, Matterport) y su cuenta: `docs/INVESTIGACION-MEDIDORES.md`.
 2. ☐ **Fase 1, sin app propia:** escaneo con OpenPlan3D Capture (gratis; el editor web de openPlan3D es MIT, el código de la app iOS no lo he localizado) y nube LiDAR con SiteScape (solo datos de prueba, C-012) → Croquis importa su `plan.json` →
    medidas guiadas tecleadas (el GLM 40-31 no tiene Bluetooth) con preguntas de huecos y salientes por pared → planos
    EA.01–EA.04 en la plantilla. Primera prueba: el comedor de Jose.
